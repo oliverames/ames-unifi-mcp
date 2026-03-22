@@ -1,0 +1,52 @@
+{
+  "name": "ames-unifi-mcp",
+  "version": "1.0.0",
+  "description": "UniFi Network MCP server — 310 tools for complete controller management via the Model Context Protocol",
+  "keywords": [
+    "mcp",
+    "unifi",
+    "ubiquiti",
+    "network",
+    "model-context-protocol",
+    "dream-machine",
+    "cloud-gateway",
+    "firewall",
+    "wifi",
+    "ai",
+    "claude",
+    "llm"
+  ],
+  "author": "Oliver Ames",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oliverames/ames-unifi-mcp.git"
+  },
+  "homepage": "https://github.com/oliverames/ames-unifi-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/oliverames/ames-unifi-mcp/issues"
+  },
+  "bin": {
+    "ames-unifi-mcp": "bin/ames-unifi-mcp"
+  },
+  "files": [
+    "dist/",
+    "install.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "postinstall": "node install.js"
+  },
+  "os": [
+    "darwin",
+    "linux"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
+  "engines": {
+    "node": ">=16"
+  }
+}

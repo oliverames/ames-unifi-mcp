@@ -24,6 +24,17 @@ func BuildAPGroupTools(c *client.Client) []*core.BaseTool {
 			},
 		},
 		{
+			ToolName: "apgroup_get", ToolDesc: "Get an AP group by ID",
+			ToolCategory: permissions.CatDevices, ToolAction: permissions.ActionRead,
+			MinVer: "6.0.0",
+			Schema: core.IDSchema(), Client: c,
+			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
+				var p struct{ ID string `json:"id"` }
+				json.Unmarshal(input, &p)
+				return c.Do(ctx, "GET", ap()+"/"+p.ID, nil)
+			},
+		},
+		{
 			ToolName: "apgroup_create", ToolDesc: "Create an AP group",
 			ToolCategory: permissions.CatDevices, ToolAction: permissions.ActionCreate,
 			MinVer: "6.0.0", Mutating: true,

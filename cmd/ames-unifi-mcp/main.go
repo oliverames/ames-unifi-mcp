@@ -47,6 +47,7 @@ func main() {
 	allTools = append(allTools, core.BuildClientTools(c)...)
 	allTools = append(allTools, core.BuildNetworkTools(c)...)
 	allTools = append(allTools, core.BuildWLANTools(c)...)
+	allTools = append(allTools, core.BuildWiFiTools(c)...)
 	allTools = append(allTools, core.BuildFirewallLegacyTools(c)...)
 	allTools = append(allTools, core.BuildFirewallZBFTools(c)...)
 	allTools = append(allTools, core.BuildACLTools(c)...)

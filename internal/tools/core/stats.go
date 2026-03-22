@@ -267,37 +267,14 @@ func BuildStatsTools(c *client.Client) []*BaseTool {
 			},
 		},
 		{
-			ToolName: "stats_sessions", ToolDesc: "List client login sessions",
-			ToolCategory: permissions.CatStats, ToolAction: permissions.ActionRead,
-			Schema: json.RawMessage(`{"type":"object","properties":{"type":{"type":"string","description":"Session type","default":"all"},"start":{"type":"integer","description":"Start time (unix seconds)"},"end":{"type":"integer","description":"End time (unix seconds)"},"mac":{"type":"string","description":"Filter by client MAC"}},"required":["start","end"]}`),
-			Client: c,
-			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct {
-					Type  string `json:"type"`
-					Start int64  `json:"start"`
-					End   int64  `json:"end"`
-					Mac   string `json:"mac,omitempty"`
-				}
-				json.Unmarshal(input, &p)
-				if p.Type == "" {
-					p.Type = "all"
-				}
-				payload := map[string]interface{}{"type": p.Type, "start": p.Start, "end": p.End}
-				if p.Mac != "" {
-					payload["mac"] = p.Mac
-				}
-				return c.Do(ctx, "POST", sp()+"/stat/session", payload)
-			},
-		},
-		{
 			ToolName: "stats_authorization", ToolDesc: "List authorization codes used in timeframe [undocumented]",
 			ToolCategory: permissions.CatStats, ToolAction: permissions.ActionRead, Undocumented: true,
-			Schema: json.RawMessage(`{"type":"object","properties":{"start":{"type":"string","description":"Start timestamp"},"end":{"type":"string","description":"End timestamp"}},"required":["start","end"]}`),
+			Schema: json.RawMessage(`{"type":"object","properties":{"start":{"type":"integer","description":"Start timestamp (unix seconds)"},"end":{"type":"integer","description":"End timestamp (unix seconds)"}},"required":["start","end"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
 				var p struct {
-					Start string `json:"start"`
-					End   string `json:"end"`
+					Start int64 `json:"start"`
+					End   int64 `json:"end"`
 				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/stat/authorization", map[string]interface{}{

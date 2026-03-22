@@ -148,6 +148,97 @@ func BuildAdminTools(c *client.Client) []*core.BaseTool {
 			},
 		},
 		{
+			ToolName: "admin_grant", ToolDesc: "Assign an existing admin to this site",
+			ToolCategory: permissions.CatSystem, ToolAction: permissions.ActionCreate, Mutating: true,
+			Schema: json.RawMessage(`{
+				"type": "object",
+				"properties": {
+					"admin_id": {"type": "string", "description": "Admin _id to grant"},
+					"role": {"type": "string", "description": "Role (default: admin)", "default": "admin"},
+					"permissions": {"type": "array", "items": {"type": "string"}, "description": "Permission list"}
+				},
+				"required": ["admin_id"]
+			}`),
+			Client: c,
+			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
+				var p struct {
+					AdminID     string   `json:"admin_id"`
+					Role        string   `json:"role"`
+					Permissions []string `json:"permissions"`
+				}
+				json.Unmarshal(input, &p)
+				if p.Role == "" {
+					p.Role = "admin"
+				}
+				payload := map[string]interface{}{
+					"cmd": "grant-admin", "admin": p.AdminID, "role": p.Role,
+				}
+				if len(p.Permissions) > 0 {
+					payload["permissions"] = p.Permissions
+				}
+				return c.Do(ctx, "POST", sp()+"/cmd/sitemgr", payload)
+			},
+		},
+		{
+			ToolName: "admin_update", ToolDesc: "Update an admin's settings (name, email, role, permissions)",
+			ToolCategory: permissions.CatSystem, ToolAction: permissions.ActionUpdate, Mutating: true,
+			Schema: json.RawMessage(`{
+				"type": "object",
+				"properties": {
+					"admin_id": {"type": "string", "description": "Admin _id"},
+					"name": {"type": "string", "description": "Admin name"},
+					"email": {"type": "string", "description": "Admin email"},
+					"role": {"type": "string", "description": "Role"},
+					"permissions": {"type": "array", "items": {"type": "string"}, "description": "Permission list"}
+				},
+				"required": ["admin_id"]
+			}`),
+			Client: c,
+			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
+				var p struct {
+					AdminID     string   `json:"admin_id"`
+					Name        string   `json:"name"`
+					Email       string   `json:"email"`
+					Role        string   `json:"role"`
+					Permissions []string `json:"permissions"`
+				}
+				json.Unmarshal(input, &p)
+				payload := map[string]interface{}{"cmd": "update-admin", "admin": p.AdminID}
+				if p.Name != "" {
+					payload["name"] = p.Name
+				}
+				if p.Email != "" {
+					payload["email"] = p.Email
+				}
+				if p.Role != "" {
+					payload["role"] = p.Role
+				}
+				if len(p.Permissions) > 0 {
+					payload["permissions"] = p.Permissions
+				}
+				return c.Do(ctx, "POST", sp()+"/cmd/sitemgr", payload)
+			},
+		},
+		{
+			ToolName: "admin_revoke_super", ToolDesc: "Delete an admin entirely (revoke from all sites)",
+			ToolCategory: permissions.CatSystem, ToolAction: permissions.ActionDelete, Mutating: true,
+			Schema: json.RawMessage(`{
+				"type": "object",
+				"properties": {
+					"admin_id": {"type": "string", "description": "Admin _id to delete entirely"}
+				},
+				"required": ["admin_id"]
+			}`),
+			Client: c,
+			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
+				var p struct{ AdminID string `json:"admin_id"` }
+				json.Unmarshal(input, &p)
+				return c.Do(ctx, "POST", sp()+"/cmd/sitemgr", map[string]interface{}{
+					"cmd": "revoke-super-admin", "admin": p.AdminID,
+				})
+			},
+		},
+		{
 			ToolName: "admin_list", ToolDesc: "List all administrators and their permissions across sites",
 			ToolCategory: permissions.CatSystem, ToolAction: permissions.ActionRead,
 			Schema: core.NoInputSchema(), Client: c,

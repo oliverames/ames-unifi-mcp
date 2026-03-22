@@ -30,6 +30,26 @@ func BuildFirewallLegacyTools(c *client.Client) []*BaseTool {
 			},
 		},
 		{
+			ToolName: "firewall_rule_get", ToolDesc: "Get a specific legacy firewall rule by ID",
+			ToolCategory: permissions.CatFirewall, ToolAction: permissions.ActionRead,
+			Schema: idSchema(), Client: c,
+			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
+				var p struct{ ID string `json:"id"` }
+				json.Unmarshal(input, &p)
+				return c.Do(ctx, "GET", sp()+"/rest/firewallrule/"+p.ID, nil)
+			},
+		},
+		{
+			ToolName: "firewall_group_get", ToolDesc: "Get a specific firewall group by ID",
+			ToolCategory: permissions.CatFirewall, ToolAction: permissions.ActionRead,
+			Schema: idSchema(), Client: c,
+			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
+				var p struct{ ID string `json:"id"` }
+				json.Unmarshal(input, &p)
+				return c.Do(ctx, "GET", sp()+"/rest/firewallgroup/"+p.ID, nil)
+			},
+		},
+		{
 			ToolName: "firewall_rule_create", ToolDesc: "Create a new legacy firewall rule",
 			ToolCategory: permissions.CatFirewall, ToolAction: permissions.ActionCreate, Mutating: true,
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"Firewall rule config"}},"required":["config"]}`),
@@ -210,6 +230,20 @@ func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
 				var p struct{ ID string `json:"id"` }
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/firewall/policies/%s", base, c.Site(), p.ID), nil)
+			},
+		},
+		{
+			ToolName: "firewall_policy_patch", ToolDesc: "Partially update a firewall policy by ID (PATCH, ZBF, Network 9.0+)",
+			ToolCategory: permissions.CatFirewall, ToolAction: permissions.ActionUpdate, Mutating: true, MinVer: "9.0.0",
+			Schema: json.RawMessage(`{"type":"object","properties":{"id":{"type":"string"},"config":{"type":"object"}},"required":["id","config"]}`),
+			Client: c,
+			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
+				var p struct {
+					ID     string          `json:"id"`
+					Config json.RawMessage `json:"config"`
+				}
+				json.Unmarshal(input, &p)
+				return c.DoRaw(ctx, "PATCH", fmt.Sprintf("%s/v1/sites/%s/firewall/policies/%s", base, c.Site(), p.ID), p.Config)
 			},
 		},
 		{

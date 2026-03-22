@@ -99,9 +99,9 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
 				var p struct {
-					Count         int    `json:"count"`
-					ExpireMinutes int    `json:"expire_minutes"`
-					Quota         int    `json:"quota"`
+					Count         int  `json:"count"`
+					ExpireMinutes int  `json:"expire_minutes"`
+					Quota         *int `json:"quota"`
 					Note          string `json:"note,omitempty"`
 					Up            int    `json:"up,omitempty"`
 					Down          int    `json:"down,omitempty"`
@@ -111,11 +111,12 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 				if p.Count == 0 {
 					p.Count = 1
 				}
-				if p.Quota == 0 {
-					p.Quota = 1
+				quota := 1
+				if p.Quota != nil {
+					quota = *p.Quota
 				}
 				payload := map[string]interface{}{
-					"cmd": "create-voucher", "n": p.Count, "expire": p.ExpireMinutes, "quota": p.Quota,
+					"cmd": "create-voucher", "n": p.Count, "expire": p.ExpireMinutes, "quota": quota,
 				}
 				if p.Note != "" {
 					payload["note"] = p.Note
@@ -154,6 +155,59 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 				return c.Do(ctx, "POST", sp()+"/cmd/hotspot", map[string]interface{}{
 					"cmd": "extend", "_id": p.ID,
 				})
+			},
+		},
+		// --- Integration API hotspot voucher tools (9.0+) ---
+		{
+			ToolName: "hotspot_voucher_list_v2", ToolDesc: "List hotspot vouchers (Integration API, Network 9.0+)",
+			ToolCategory: permissions.CatHotspot, ToolAction: permissions.ActionRead, MinVer: "9.0.0",
+			Schema: core.NoInputSchema(), Client: c,
+			Handler: func(ctx context.Context, _ json.RawMessage) (json.RawMessage, error) {
+				base := c.Config().BaseURL() + "/integration"
+				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/hotspot/vouchers", base, c.Site()), nil)
+			},
+		},
+		{
+			ToolName: "hotspot_voucher_get_v2", ToolDesc: "Get voucher details by ID (Integration API, Network 9.0+)",
+			ToolCategory: permissions.CatHotspot, ToolAction: permissions.ActionRead, MinVer: "9.0.0",
+			Schema: core.IDSchema(), Client: c,
+			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
+				var p struct{ ID string `json:"id"` }
+				json.Unmarshal(input, &p)
+				base := c.Config().BaseURL() + "/integration"
+				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/hotspot/vouchers/%s", base, c.Site(), p.ID), nil)
+			},
+		},
+		{
+			ToolName: "hotspot_voucher_create_v2", ToolDesc: "Generate vouchers (Integration API, Network 9.0+)",
+			ToolCategory: permissions.CatHotspot, ToolAction: permissions.ActionCreate, Mutating: true, MinVer: "9.0.0",
+			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"Voucher generation config"}},"required":["config"]}`),
+			Client: c,
+			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
+				var p struct{ Config json.RawMessage `json:"config"` }
+				json.Unmarshal(input, &p)
+				base := c.Config().BaseURL() + "/integration"
+				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/hotspot/vouchers", base, c.Site()), p.Config)
+			},
+		},
+		{
+			ToolName: "hotspot_voucher_delete_v2", ToolDesc: "Delete a voucher by ID (Integration API, Network 9.0+)",
+			ToolCategory: permissions.CatHotspot, ToolAction: permissions.ActionDelete, Mutating: true, MinVer: "9.0.0",
+			Schema: core.IDSchema(), Client: c,
+			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
+				var p struct{ ID string `json:"id"` }
+				json.Unmarshal(input, &p)
+				base := c.Config().BaseURL() + "/integration"
+				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/hotspot/vouchers/%s", base, c.Site(), p.ID), nil)
+			},
+		},
+		{
+			ToolName: "hotspot_voucher_bulk_delete", ToolDesc: "Delete all vouchers (Integration API, Network 9.0+)",
+			ToolCategory: permissions.CatHotspot, ToolAction: permissions.ActionDelete, Mutating: true, MinVer: "9.0.0",
+			Schema: core.NoInputSchema(), Client: c,
+			Handler: func(ctx context.Context, _ json.RawMessage) (json.RawMessage, error) {
+				base := c.Config().BaseURL() + "/integration"
+				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/hotspot/vouchers", base, c.Site()), nil)
 			},
 		},
 		{

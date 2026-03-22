@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/oliveames/ames-unifi-mcp/internal/config"
@@ -20,7 +21,10 @@ import (
 type Client struct {
 	cfg        *config.Config
 	httpClient *http.Client
+	mu         sync.RWMutex // protects csrfToken and loginGen
 	csrfToken  string
+	loginGen   uint64    // incremented on each successful login; used to coalesce concurrent re-logins
+	loginMu    sync.Mutex // serializes re-login attempts
 }
 
 // LegacyResponse is the envelope for legacy API responses.
@@ -92,9 +96,12 @@ func (c *Client) login(ctx context.Context) error {
 	}
 
 	// Capture CSRF token from response header (required for mutations on UniFi OS)
+	c.mu.Lock()
 	if token := resp.Header.Get("X-Csrf-Token"); token != "" {
 		c.csrfToken = token
 	}
+	c.loginGen++
+	c.mu.Unlock()
 
 	return nil
 }
@@ -105,61 +112,84 @@ func (c *Client) login(ctx context.Context) error {
 func (c *Client) Do(ctx context.Context, method, path string, payload interface{}) (json.RawMessage, error) {
 	url := c.cfg.BaseURL() + "/" + strings.TrimLeft(path, "/")
 
-	var bodyReader io.Reader
+	var bodyBytes []byte
 	if payload != nil {
 		data, err := json.Marshal(payload)
 		if err != nil {
 			return nil, fmt.Errorf("marshaling payload: %w", err)
 		}
-		bodyReader = bytes.NewReader(data)
+		bodyBytes = data
 	}
 
-	req, err := http.NewRequestWithContext(ctx, method, url, bodyReader)
-	if err != nil {
-		return nil, fmt.Errorf("creating request: %w", err)
+	newReq := func() (*http.Request, error) {
+		var body io.Reader
+		if bodyBytes != nil {
+			body = bytes.NewReader(bodyBytes)
+		}
+		req, err := http.NewRequestWithContext(ctx, method, url, body)
+		if err != nil {
+			return nil, err
+		}
+		c.setHeaders(req)
+		return req, nil
 	}
 
-	c.setHeaders(req)
+	// Snapshot login generation before the request so we can detect concurrent re-logins.
+	c.mu.RLock()
+	genBefore := c.loginGen
+	c.mu.RUnlock()
 
-	resp, err := c.doWithRetry(req, 3)
+	resp, err := c.doWithRetry(newReq, 3)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
 
 	respBody, err := io.ReadAll(resp.Body)
+	resp.Body.Close()
 	if err != nil {
 		return nil, fmt.Errorf("reading response: %w", err)
 	}
 
 	if resp.StatusCode == http.StatusUnauthorized && c.cfg.AuthMethod() == config.AuthUserPass {
-		// Session expired — re-login and retry once
-		if err := c.login(ctx); err != nil {
+		// Session expired — single-flight re-login (coalesces concurrent 401s)
+		if err := c.reloginIfNeeded(ctx, genBefore); err != nil {
 			return nil, fmt.Errorf("re-login failed: %w", err)
 		}
-		req2, _ := http.NewRequestWithContext(ctx, method, url, bodyReader)
-		c.setHeaders(req2)
+		req2, err := newReq()
+		if err != nil {
+			return nil, fmt.Errorf("creating retry request: %w", err)
+		}
 		resp2, err := c.httpClient.Do(req2)
 		if err != nil {
 			return nil, err
 		}
-		defer resp2.Body.Close()
 		respBody, _ = io.ReadAll(resp2.Body)
+		resp2.Body.Close()
 		if resp2.StatusCode >= 400 {
 			return nil, fmt.Errorf("request failed after re-login (%d): %s", resp2.StatusCode, string(respBody))
 		}
-		resp = resp2
 	} else if resp.StatusCode >= 400 {
 		return nil, fmt.Errorf("request failed (%d): %s", resp.StatusCode, string(respBody))
 	}
 
-	// Parse legacy API envelope
+	// Parse legacy API envelope.
+	// Only extract .Data if the response actually has the legacy envelope
+	// structure (meta.rc is present). Otherwise return the raw body to avoid
+	// silently discarding non-legacy JSON responses.
 	var envelope LegacyResponse
 	if err := json.Unmarshal(respBody, &envelope); err != nil {
-		// Not a legacy response — return raw body (e.g., v2 API)
+		// Not valid JSON — return raw body
+		return respBody, nil
+	}
+	if envelope.Meta.RC == "" {
+		// No meta.rc field — not a legacy envelope, return full body
 		return respBody, nil
 	}
 	if envelope.Meta.RC == "error" {
+		// Include data array in error when available (often contains field-level validation details)
+		if len(envelope.Data) > 0 && string(envelope.Data) != "[]" {
+			return nil, fmt.Errorf("controller error: %s — %s", envelope.Meta.Msg, string(envelope.Data))
+		}
 		return nil, fmt.Errorf("controller error: %s", envelope.Meta.Msg)
 	}
 
@@ -167,33 +197,65 @@ func (c *Client) Do(ctx context.Context, method, path string, payload interface{
 }
 
 // DoRaw executes a request and returns the raw response body without envelope parsing.
-// Use for Integration API or v2 endpoints.
+// Use for Integration API or v2 endpoints. Handles 401 re-login for session auth.
 func (c *Client) DoRaw(ctx context.Context, method, fullURL string, payload interface{}) (json.RawMessage, error) {
-	var bodyReader io.Reader
+	var bodyBytes []byte
 	if payload != nil {
 		data, err := json.Marshal(payload)
 		if err != nil {
 			return nil, fmt.Errorf("marshaling payload: %w", err)
 		}
-		bodyReader = bytes.NewReader(data)
+		bodyBytes = data
 	}
 
-	req, err := http.NewRequestWithContext(ctx, method, fullURL, bodyReader)
+	newReq := func() (*http.Request, error) {
+		var body io.Reader
+		if bodyBytes != nil {
+			body = bytes.NewReader(bodyBytes)
+		}
+		req, err := http.NewRequestWithContext(ctx, method, fullURL, body)
+		if err != nil {
+			return nil, err
+		}
+		c.setHeaders(req)
+		return req, nil
+	}
+
+	// Snapshot login generation before the request so we can detect concurrent re-logins.
+	c.mu.RLock()
+	genBefore := c.loginGen
+	c.mu.RUnlock()
+
+	resp, err := c.doWithRetry(newReq, 3)
 	if err != nil {
 		return nil, err
 	}
-
-	c.setHeaders(req)
-
-	resp, err := c.doWithRetry(req, 3)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
+	resp.Body.Close()
 	if err != nil {
 		return nil, fmt.Errorf("reading response: %w", err)
+	}
+
+	if resp.StatusCode == http.StatusUnauthorized && c.cfg.AuthMethod() == config.AuthUserPass {
+		// Session expired — single-flight re-login (coalesces concurrent 401s)
+		if err := c.reloginIfNeeded(ctx, genBefore); err != nil {
+			return nil, fmt.Errorf("re-login failed: %w", err)
+		}
+		req2, err := newReq()
+		if err != nil {
+			return nil, fmt.Errorf("creating retry request: %w", err)
+		}
+		resp2, err := c.httpClient.Do(req2)
+		if err != nil {
+			return nil, err
+		}
+		body, _ = io.ReadAll(resp2.Body)
+		resp2.Body.Close()
+		if resp2.StatusCode >= 400 {
+			return nil, fmt.Errorf("request failed after re-login (%d): %s", resp2.StatusCode, string(body))
+		}
+		return body, nil
 	}
 
 	if resp.StatusCode >= 400 {
@@ -203,6 +265,25 @@ func (c *Client) DoRaw(ctx context.Context, method, fullURL string, payload inte
 	return body, nil
 }
 
+// reloginIfNeeded performs a single-flight re-login. If another goroutine
+// already refreshed the session (loginGen changed), the login is skipped.
+// Returns nil if the session is now valid (either refreshed or already refreshed by another goroutine).
+func (c *Client) reloginIfNeeded(ctx context.Context, genBefore uint64) error {
+	c.loginMu.Lock()
+	defer c.loginMu.Unlock()
+
+	// Check if another goroutine already refreshed
+	c.mu.RLock()
+	currentGen := c.loginGen
+	c.mu.RUnlock()
+
+	if currentGen != genBefore {
+		return nil // another goroutine already re-logged in
+	}
+
+	return c.login(ctx)
+}
+
 func (c *Client) setHeaders(req *http.Request) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
@@ -210,16 +291,23 @@ func (c *Client) setHeaders(req *http.Request) {
 	if c.cfg.AuthMethod() == config.AuthAPIKey {
 		req.Header.Set("X-API-Key", c.cfg.APIKey)
 	}
-	if c.csrfToken != "" {
-		req.Header.Set("X-Csrf-Token", c.csrfToken)
+	c.mu.RLock()
+	token := c.csrfToken
+	c.mu.RUnlock()
+	if token != "" {
+		req.Header.Set("X-Csrf-Token", token)
 	}
 }
 
-func (c *Client) doWithRetry(req *http.Request, maxRetries int) (*http.Response, error) {
+func (c *Client) doWithRetry(newReq func() (*http.Request, error), maxRetries int) (*http.Response, error) {
 	var lastErr error
 	for attempt := 0; attempt <= maxRetries; attempt++ {
 		if attempt > 0 {
 			time.Sleep(time.Duration(attempt*attempt) * 500 * time.Millisecond)
+		}
+		req, err := newReq()
+		if err != nil {
+			return nil, fmt.Errorf("creating request: %w", err)
 		}
 		resp, err := c.httpClient.Do(req)
 		if err != nil {

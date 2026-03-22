@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/oliveames/ames-unifi-mcp/internal/client"
 	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
@@ -41,16 +40,6 @@ func (b *BaseTool) Execute(ctx context.Context, input json.RawMessage) (json.Raw
 		return nil, fmt.Errorf("no handler for tool %s", b.ToolName)
 	}
 	return b.Handler(ctx, input)
-}
-
-// get is a convenience for GET requests to the legacy API.
-func get(c *client.Client, ctx context.Context, path string) (json.RawMessage, error) {
-	return c.Do(ctx, http.MethodGet, path, nil)
-}
-
-// sitePath returns the site-scoped API path prefix.
-func sitePath(c *client.Client) string {
-	return c.SitePath()
 }
 
 // noInputSchema returns a schema with no required parameters.

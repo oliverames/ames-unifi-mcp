@@ -93,6 +93,14 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 			},
 		},
 		{
+			ToolName: "client_list_configured", ToolDesc: "List all configured/known clients via REST (includes static IPs, names, groups)",
+			ToolCategory: permissions.CatClients, ToolAction: permissions.ActionRead,
+			Schema: noInputSchema(), Client: c,
+			Handler: func(ctx context.Context, _ json.RawMessage) (json.RawMessage, error) {
+				return c.Do(ctx, "GET", sp()+"/rest/user", nil)
+			},
+		},
+		{
 			ToolName: "client_get_configured", ToolDesc: "Get configured/known client details by MAC (includes historical data)",
 			ToolCategory: permissions.CatClients, ToolAction: permissions.ActionRead,
 			Schema: macSchema(), Client: c,
@@ -144,15 +152,66 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 				return c.Do(ctx, "PUT", sp()+"/rest/user/"+p.ID, p.Config)
 			},
 		},
+		// --- Integration API tools (9.0+) ---
 		{
-			ToolName: "client_sessions", ToolDesc: "List client login sessions",
+			ToolName: "client_list_v2", ToolDesc: "List connected clients (Integration API, structured response)",
+			ToolCategory: permissions.CatClients, ToolAction: permissions.ActionRead, MinVer: "9.0.0",
+			Schema: noInputSchema(), Client: c,
+			Handler: func(ctx context.Context, _ json.RawMessage) (json.RawMessage, error) {
+				base := c.Config().BaseURL() + "/integration"
+				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/clients", base, c.Site()), nil)
+			},
+		},
+		{
+			ToolName: "client_get_v2", ToolDesc: "Get client details by client ID (Integration API)",
+			ToolCategory: permissions.CatClients, ToolAction: permissions.ActionRead, MinVer: "9.0.0",
+			Schema: json.RawMessage(`{
+				"type": "object",
+				"properties": {
+					"client_id": {"type": "string", "description": "Client ID"}
+				},
+				"required": ["client_id"]
+			}`),
+			Client: c,
+			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
+				var p struct{ ClientID string `json:"client_id"` }
+				json.Unmarshal(input, &p)
+				base := c.Config().BaseURL() + "/integration"
+				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/clients/%s", base, c.Site(), p.ClientID), nil)
+			},
+		},
+		{
+			ToolName: "client_action", ToolDesc: "Execute a client action (Integration API)",
+			ToolCategory: permissions.CatClients, ToolAction: permissions.ActionExecute, Mutating: true, MinVer: "9.0.0",
+			Schema: json.RawMessage(`{
+				"type": "object",
+				"properties": {
+					"client_id": {"type": "string", "description": "Client ID"},
+					"config": {"type": "object", "description": "Action payload"}
+				},
+				"required": ["client_id", "config"]
+			}`),
+			Client: c,
+			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
+				var p struct {
+					ClientID string          `json:"client_id"`
+					Config   json.RawMessage `json:"config"`
+				}
+				json.Unmarshal(input, &p)
+				base := c.Config().BaseURL() + "/integration"
+				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/clients/%s/actions", base, c.Site(), p.ClientID), p.Config)
+			},
+		},
+		{
+			ToolName: "client_sessions", ToolDesc: "List client login sessions (optionally filtered by MAC, time range, and type)",
 			ToolCategory: permissions.CatClients, ToolAction: permissions.ActionRead,
 			Schema: json.RawMessage(`{
 				"type": "object",
 				"properties": {
 					"mac": {"type": "string", "description": "Client MAC address (optional, filters to one client)"},
 					"start": {"type": "integer", "description": "Start time (unix timestamp seconds)"},
-					"end": {"type": "integer", "description": "End time (unix timestamp seconds)"}
+					"end": {"type": "integer", "description": "End time (unix timestamp seconds)"},
+					"type": {"type": "string", "description": "Session type (default: all)", "default": "all"}
 				}
 			}`),
 			Client: c,
@@ -161,9 +220,13 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 					Mac   string `json:"mac"`
 					Start int64  `json:"start"`
 					End   int64  `json:"end"`
+					Type  string `json:"type"`
 				}
 				json.Unmarshal(input, &p)
-				body := map[string]interface{}{"type": "all"}
+				if p.Type == "" {
+					p.Type = "all"
+				}
+				body := map[string]interface{}{"type": p.Type}
 				if p.Mac != "" {
 					body["mac"] = p.Mac
 				}

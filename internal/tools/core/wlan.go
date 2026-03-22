@@ -79,5 +79,25 @@ func BuildWLANTools(c *client.Client) []*BaseTool {
 				return c.Do(ctx, "DELETE", sp()+"/rest/wlanconf/"+p.ID, nil)
 			},
 		},
+		{
+			ToolName: "wlan_enable", ToolDesc: "Enable a wireless network (turn SSID on)",
+			ToolCategory: permissions.CatWLAN, ToolAction: permissions.ActionUpdate, Mutating: true,
+			Schema: idSchema(), Client: c,
+			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
+				var p struct{ ID string `json:"id"` }
+				json.Unmarshal(input, &p)
+				return c.Do(ctx, "PUT", sp()+"/rest/wlanconf/"+p.ID, map[string]interface{}{"enabled": true})
+			},
+		},
+		{
+			ToolName: "wlan_disable", ToolDesc: "Disable a wireless network (turn SSID off)",
+			ToolCategory: permissions.CatWLAN, ToolAction: permissions.ActionUpdate, Mutating: true,
+			Schema: idSchema(), Client: c,
+			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
+				var p struct{ ID string `json:"id"` }
+				json.Unmarshal(input, &p)
+				return c.Do(ctx, "PUT", sp()+"/rest/wlanconf/"+p.ID, map[string]interface{}{"enabled": false})
+			},
+		},
 	}
 }

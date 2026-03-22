@@ -128,6 +128,27 @@ func BuildCloudTools(c *client.Client) []*core.BaseTool {
 			},
 		},
 		{
+			ToolName: "cloud_isp_metrics_query", ToolDesc: "Query ISP metrics for specific sites with per-site time ranges (Cloud API)",
+			ToolCategory: permissions.CatStats, ToolAction: permissions.ActionRead,
+			Schema: json.RawMessage(`{
+				"type": "object",
+				"properties": {
+					"type": {"type": "string", "enum": ["5m", "1h"], "description": "Metric interval type"},
+					"config": {"type": "object", "description": "Query payload with site-specific time ranges"}
+				},
+				"required": ["type", "config"]
+			}`),
+			Client: c,
+			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
+				var p struct {
+					Type   string          `json:"type"`
+					Config json.RawMessage `json:"config"`
+				}
+				json.Unmarshal(input, &p)
+				return c.DoRaw(ctx, http.MethodPost, baseURL+"/v1/isp-metrics/"+p.Type+"/query", p.Config)
+			},
+		},
+		{
 			ToolName: "cloud_sdwan_list", ToolDesc: "List SD-WAN configurations (Cloud API)",
 			ToolCategory: permissions.CatSystem, ToolAction: permissions.ActionRead,
 			Schema: core.NoInputSchema(), Client: c,

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://ui.com/favicon-32x32.png" width="48" height="48" alt="UniFi">
+  <img src="icon.png" width="80" height="80" alt="UniFi">
 </p>
 
 <h1 align="center">UniFi MCP Server</h1>
@@ -13,6 +13,12 @@
   <code>16 categories</code> &nbsp;&bull;&nbsp;
   <code>3 API layers</code> &nbsp;&bull;&nbsp;
   <code>Network 5.x &ndash; 10.x</code>
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/ames-unifi-mcp"><img src="https://img.shields.io/npm/v/ames-unifi-mcp?style=flat-square&color=f5a542" alt="npm"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-f5a542?style=flat-square" alt="License"></a>
+  <a href="https://www.buymeacoffee.com/oliverames"><img src="https://img.shields.io/badge/Buy_Me_a_Coffee-support-f5a542?style=flat-square&logo=buy-me-a-coffee&logoColor=white" alt="Buy Me a Coffee"></a>
 </p>
 
 <p align="center">
@@ -397,10 +403,21 @@ Here's what natural-language network management looks like:
 
 ## License
 
-MIT
+MIT &mdash; Not affiliated with Ubiquiti Inc.
 
 ---
 
 <p align="center">
-  <sub>Built for UniFi OS &nbsp;&bull;&nbsp; Supports Dream Machine, Cloud Gateway, and unifi.ui.com &nbsp;&bull;&nbsp; Not affiliated with Ubiquiti Inc.</sub>
+  <a href="https://www.buymeacoffee.com/oliverames">
+    <img src="https://img.shields.io/badge/Buy_Me_a_Coffee-support-f5a542?style=for-the-badge&logo=buy-me-a-coffee&logoColor=white" alt="Buy Me a Coffee">
+  </a>
+</p>
+
+<p align="center">
+  <sub>
+    Built by <a href="https://ames.consulting">Oliver Ames</a> in Vermont
+    &bull; <a href="https://github.com/oliverames">GitHub</a>
+    &bull; <a href="https://linkedin.com/in/oliverames">LinkedIn</a>
+    &bull; <a href="https://bsky.app/profile/oliverames.bsky.social">Bluesky</a>
+  </sub>
 </p>

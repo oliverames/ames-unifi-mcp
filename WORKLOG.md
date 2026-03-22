@@ -1,5 +1,26 @@
 # Worklog
 
+## 2026-03-22 — Security audit across all public repos, Mistral key rotation
+
+**What changed**: Ran parallel Opus agents to audit all 8 public repos for leaked secrets. Found and fixed: Mistral API key hardcoded in ames-consulting (merged PR #11), `.claude/settings.json` committed in sunshine-trail and ping-warden (removed), hardcoded YNAB budget UUID in test.js (replaced with env var), credential storage paths leaked in ynab WORKLOG (redacted), missing LICENSE in ynab (added). Rotated compromised Mistral API key and updated it in settings.json, credentials/env.json, voicemate xcconfig, and 60+ backup archive files. Also created `readme-style` skill in ames-skills codifying Oliver's README conventions.
+
+**Decisions made**:
+- Kept `.claude/rules/` in ames-consulting repo (useful coding conventions for contributors) but removed `settings.json` (IDE config that shouldn't be public)
+- Updated old Mistral key in backup archive files too — even though they're private, the old key appearing anywhere is a liability
+- Created the readme-style skill as a standalone skill rather than adding it to wrap-up — it's a creative/design concern, not a session-end checklist item
+
+**Left off at**: All 8 public repos are audited and clean. Next session should:
+1. Run `gh secret-scanning` or BFG Repo-Cleaner on repos with secrets in git history (ames-consulting Mistral key, ynab budget UUID, sunshine-trail old password)
+2. Audit meta-mcp-server git history (current HEAD is clean but history wasn't scanned due to Bash sandbox limitations)
+3. Package ames-unifi-mcp as DXT extension for Claude Desktop/Cowork
+4. Consider adding a `repo-audit` skill that automates the secret scanning workflow
+
+**Open questions**:
+- Should we use BFG Repo-Cleaner to scrub old secrets from git history, or accept that rotating the keys is sufficient?
+- The protect-secrets hook blocks legitimate audit commands — should it have an override for audit workflows?
+
+---
+
 ## 2026-03-22 — Branding, SEO, GitHub housekeeping
 
 **What changed**: Applied branded README styling across all 8 public repos — amber badge colors (#f5a542), Buy Me a Coffee links (badge row + footer), ames.consulting footer with social links. Maxed all repos to 20 GitHub topics for SEO. Set homepage URLs (npm links for MCP servers, live sites for web projects). Created `readme-style` skill in ames-skills to codify these conventions. Fixed GitHub auth: removed stale `GITHUB_TOKEN` from settings.json so `gh` uses its keyring token (which has `delete_repo` scope). Made archived repos (geforce-now-launcher, get-filenames) private. Deleted nanoclaw. Made MCP servers (imagerelay, sprout, ynab, unifi) public. Updated wrap-up skill to v2.2.0 with README staleness checks and npm publish detection.

@@ -1,5 +1,27 @@
 # Worklog
 
+## 2026-03-22 — NPM publish + icon
+
+**What changed**: Published `ames-unifi-mcp@1.0.0` to npm. Created package.json with postinstall script that copies the correct platform binary (darwin/linux, amd64/arm64) to `bin/`. Added .npmignore to exclude Go source from the npm tarball. Added MIT LICENSE. Added UniFi icon (icon.png) for future DXT packaging.
+
+**Decisions made**:
+- Used the postinstall-copies-binary pattern (like esbuild/turbo) rather than per-platform npm packages (@ames-unifi-mcp/darwin-arm64 etc.) — simpler, single package, 11.8 MB compressed for all 4 platforms
+- Kept `dist/` in .gitignore but ship it in the npm package via the `files` field — binaries are build artifacts, not source
+- Named the npm package `ames-unifi-mcp` matching the binary name for simplicity
+
+**Left off at**: Package is live on npm. Next session should:
+1. Package as a DXT extension for Claude Desktop/Cowork (icon.png is ready)
+2. Test `npm install -g ames-unifi-mcp` on a clean machine to verify the postinstall flow
+3. Consider adding Windows support (GOOS=windows) if there's demand
+4. Test against a real Dream Machine to validate the full tool set
+
+**Open questions**:
+- Should the npm package include a `--version` flag in the binary for debugging?
+- DXT packaging: does it need a different manifest format than the MCP server config block?
+- Should we set up GitHub Actions to auto-publish new npm versions on git tags?
+
+---
+
 ## 2026-03-22 — Deep review: 7 bugs fixed, 39 tools added (310 total), README rewritten
 
 **What changed**: Ran a comprehensive Ralph Loop review (10+ iterations) covering bug hunting and API coverage auditing. Fixed 7 bugs in client.go: DoRaw missing 401 re-login (all Integration/Cloud API calls would fail on session expiry), csrfToken data race across concurrent batch goroutines (added sync.RWMutex), HTTP response body leak on 401 retry (defer captured variable by reference), thundering herd on concurrent 401s (added single-flight re-login with generation counter), stats_authorization using string timestamps instead of integers, duplicate system_vpn_list, dead code. Enhanced controller error messages to include data array details. Added 39 new tools: traffic routes CRUD (v2 API), VPN server/tunnel CRUD (Integration API 10.1+), switching stacks/LAGs/MC-LAGs CRUD (10.0+), device_upgrade_all, wlan_enable/disable, backup restore, hotspot operator/2.0/package CRUD, scheduled task CRUD. Rewrote README with full 310-tool coverage breakdown, architecture docs, and usage examples.

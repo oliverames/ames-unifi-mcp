@@ -14,9 +14,10 @@
 *.out
 coverage.txt
 
-# IDE
+# IDE / Agent
 .idea/
 .vscode/
+.claude/
 *.swp
 *.swo
 *~

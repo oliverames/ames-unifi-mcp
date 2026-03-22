@@ -1,5 +1,26 @@
 # Worklog
 
+## 2026-03-22 — Branding, SEO, GitHub housekeeping
+
+**What changed**: Applied branded README styling across all 8 public repos — amber badge colors (#f5a542), Buy Me a Coffee links (badge row + footer), ames.consulting footer with social links. Maxed all repos to 20 GitHub topics for SEO. Set homepage URLs (npm links for MCP servers, live sites for web projects). Created `readme-style` skill in ames-skills to codify these conventions. Fixed GitHub auth: removed stale `GITHUB_TOKEN` from settings.json so `gh` uses its keyring token (which has `delete_repo` scope). Made archived repos (geforce-now-launcher, get-filenames) private. Deleted nanoclaw. Made MCP servers (imagerelay, sprout, ynab, unifi) public. Updated wrap-up skill to v2.2.0 with README staleness checks and npm publish detection.
+
+**Decisions made**:
+- Used amber #f5a542 (from ames.consulting brand) as the unifying color for all GitHub badge shields across repos
+- Chose `flat-square` style for header badges, `for-the-badge` for the larger footer Buy Me a Coffee button
+- Applied footer consistently: "Built by Oliver Ames in Vermont" + GitHub/LinkedIn/Bluesky links
+- Secret audit agents couldn't run due to Bash sandbox restrictions on subagents — needs different approach next session
+
+**Left off at**: Secret audit across all 8 public repos was attempted but blocked by subagent sandbox permissions. Next session should:
+1. Run the secret/cleanup audit manually (not via subagents) — scan git history for leaked keys, .env files, internal IPs
+2. Package as DXT extension for Claude Desktop/Cowork (icon.png is ready)
+3. Consider GitHub Actions for auto-publishing npm on git tags
+
+**Open questions**:
+- Should subagent audit tasks use a different permission model? The `block-dangerous-commands` hook prevented git history scanning
+- Are there secrets in git history that need BFG Repo-Cleaner treatment?
+
+---
+
 ## 2026-03-22 — NPM publish + icon
 
 **What changed**: Published `ames-unifi-mcp@1.0.0` to npm. Created package.json with postinstall script that copies the correct platform binary (darwin/linux, amd64/arm64) to `bin/`. Added .npmignore to exclude Go source from the npm tarball. Added MIT LICENSE. Added UniFi icon (icon.png) for future DXT packaging.

@@ -18,7 +18,6 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/ames-unifi-mcp"><img src="https://img.shields.io/npm/v/ames-unifi-mcp?style=flat-square&color=f5a542" alt="npm"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-f5a542?style=flat-square" alt="License"></a>
-  <a href="https://www.buymeacoffee.com/oliverames"><img src="https://img.shields.io/badge/Buy_Me_a_Coffee-support-f5a542?style=flat-square&logo=buy-me-a-coffee&logoColor=white" alt="Buy Me a Coffee"></a>
 </p>
 
 <p align="center">

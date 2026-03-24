@@ -1,20 +1,55 @@
-# ames-unifi-mcp — Agent Guide
+# ames-unifi-mcp
 
-You are interacting with a UniFi Network controller through an MCP server. The controller is a Dream Machine running UniFi OS.
+Go-based MCP server for UniFi Network controller management. 310 tools across 16 categories, lazy mode by default. Distributed via npm (`ames-unifi-mcp`), installed by `npx`. Published with `npm publish` from repo root (requires `package.json` version bump).
 
-## How to use tools
+## Commands
 
-This server uses **lazy mode** by default. You have 3 meta-tools:
+| Task | Command |
+|------|---------|
+| Build | `make build` |
+| Build all platforms | `make build-all` (darwin/linux × arm64/amd64 → `dist/`) |
+| Test | `make test` (`go test -race -cover ./...`) |
+| Lint | `make lint` (`golangci-lint run ./...`) |
+| Clean | `make clean` |
+| Docker | `make docker` (multi-arch buildx) |
+| Research | `make research` (print API research sources before adding tools) |
+| Release | `make build-all && npm version patch && npm publish` (bump version, cross-compile, publish) |
 
-1. **`tool_index`** — List all available tools. Filter by category: `devices`, `clients`, `networks`, `wlan`, `firewall`, `stats`, `events`, `system`, `hotspot`, `poe`, `dpi`, `backup`, `settings`, `routing`, `vpn`, `qos`.
-2. **`tool_execute`** — Execute a tool by name with input parameters.
-3. **`tool_batch`** — Execute multiple tools in parallel (e.g., get device list + client list simultaneously).
+## Source Structure
 
-### Workflow
+```
+cmd/ames-unifi-mcp/main.go         Entry point, server wiring
+internal/
+  config/                           Environment config loading
+  client/                           HTTP client (session auth, auto re-login)
+  permissions/                      Permission profile enforcement
+  tools/
+    metatools.go                    tool_index, tool_execute, tool_batch
+    registry.go                     Tool registration and lazy/eager mode
+    confirm.go                      Confirm gate (dry-run previews)
+    core/                           Core API tools (devices, clients, firewall, stats, etc.)
+    extended/                       Extended tools (hotspot, PoE, admin, syslog, etc.)
+  version/                          Controller version auto-detection
+```
 
-1. Call `tool_index` to see available tools (optionally filter by category)
-2. Call `tool_execute` with the tool name and its parameters
-3. For multi-step operations, use `tool_batch` to parallelize independent queries
+## Environment Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `UNIFI_HOST` | Yes | — | Controller URL (`https://192.168.1.1`) |
+| `UNIFI_API_KEY` | * | — | API key (preferred, requires 9.1.105+) |
+| `UNIFI_USERNAME` | * | — | Username (if no API key) |
+| `UNIFI_PASSWORD` | * | — | Password (if no API key) |
+| `UNIFI_SITE` | No | `default` | Site name |
+| `UNIFI_VERIFY_SSL` | No | `true` | `false` for self-signed certs |
+| `UNIFI_TOOL_MODE` | No | `lazy` | `lazy` (3 meta-tools) or `eager` (all 310) |
+| `UNIFI_PERMISSION_PROFILE` | No | `standard` | `read-only`, `standard`, or `admin` |
+
+\* Either `UNIFI_API_KEY` or both `UNIFI_USERNAME` + `UNIFI_PASSWORD` required.
+
+## Lazy Mode Architecture
+
+Default mode exposes 3 meta-tools (`tool_index`, `tool_execute`, `tool_batch`) instead of all 310. Implementation in `internal/tools/metatools.go`. The registry in `registry.go` handles both modes — `UNIFI_TOOL_MODE=eager` registers all tools directly. Categories: `devices`, `clients`, `networks`, `wlan`, `firewall`, `stats`, `events`, `system`, `hotspot`, `poe`, `dpi`, `backup`, `settings`, `routing`, `vpn`, `qos`.
 
 ## Safety: Confirm Gate
 
@@ -43,29 +78,27 @@ The server auto-detects the controller version. Some tools are only available on
 
 If a tool isn't in the index, the controller may be too old.
 
-## Common Multi-Step Operations
-
-**Find and restart a specific device:**
-1. `device_list_basic` to find the device by name/type
-2. `device_restart` with the MAC address (will dry-run first)
-
-**Check network health:**
-1. Use `tool_batch` with `stats_site_health` + `client_list_active` + `alarm_count`
-
-**Investigate a client issue:**
-1. `client_get` with the MAC to check connection status
-2. `stats_dpi_client` to see bandwidth usage by app
-3. `client_reconnect` to force reconnect if needed
-
-**Manage guest access:**
-1. `hotspot_create_voucher` to generate access codes
-2. `hotspot_authorize_guest` for direct MAC-based authorization
-3. `hotspot_list_guests` to see active sessions
-
 ## MAC Address Format
 
 Always use lowercase MACs (e.g., `aa:bb:cc:dd:ee:ff`). The controller expects this format.
 
+## Adding New Tools
+
+Before implementing a new tool, check `docs/api-research.md` and update it with findings from:
+- https://developer.ui.com/
+- https://ubntwiki.com/products/software/unifi-controller/api
+- https://beez.ly/unifi-apis/
+
+Tool handlers follow the pattern in `internal/tools/core/*.go` — each file covers one category.
+
 ## Undocumented Endpoints
 
 Some tools use undocumented endpoints (marked in their descriptions). These work reliably on current firmware but behavior may change across versions. Examples: device locate (LED blink), per-client DPI stats, PoE power cycling.
+
+## Gotchas
+
+- **Self-signed certs**: Most UniFi controllers use self-signed TLS. Set `UNIFI_VERIFY_SSL=false` or requests will fail silently.
+- **Makefile module path**: The `MODULE` var in the Makefile references `oliveames` (missing `r`). This doesn't affect builds but matters if Go module tooling uses it.
+- **Session re-login thundering herd**: The client uses single-flight re-login to prevent parallel batch operations from all hitting the login endpoint simultaneously. If you see auth errors during batch calls, this is already handled — don't add extra retry logic.
+- **API key vs session auth scope**: API key auth works with Legacy + Integration API. But some v2 API endpoints only accept session cookies — if a v2 tool fails with an API key, try username/password auth.
+- **tool_batch parallelism**: `tool_batch` executes tools concurrently. Don't batch operations that depend on each other's results (e.g., create network → assign device to that network).

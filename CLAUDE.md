@@ -75,6 +75,9 @@ The server auto-detects the controller version. Some tools are only available on
 - **Integration API endpoints** (VPN servers, WiFi broadcasts): Network 9.0+
 - **DNS Policies**: Network 10.0+
 - **ACL Rules**: Network 10.0+
+- **Switch Stacks, LAGs, MC-LAGs**: Network 10.0+
+- **Traffic Matching Lists**: Network 10.0+
+- **VPN Server/Tunnel CRUD** (create, update, delete): Network 10.1+
 
 If a tool isn't in the index, the controller may be too old.
 

@@ -36,7 +36,8 @@
     "LICENSE"
   ],
   "scripts": {
-    "postinstall": "node install.js"
+    "postinstall": "node install.js",
+    "postpublish": "$HOME/Developer/projects/ames-claude/bump-and-sync"
   },
   "os": [
     "darwin",

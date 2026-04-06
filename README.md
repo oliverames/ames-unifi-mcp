@@ -293,6 +293,19 @@ The server covers all three UniFi API layers:
 
 **Username/Password** &mdash; Uses session cookies with automatic re-login on expiry. The server includes a single-flight re-login mechanism that prevents thundering-herd issues when batch operations encounter session timeouts simultaneously.
 
+### 1Password Integration
+
+If credentials are not set in the environment, the server automatically attempts to resolve them from [1Password CLI](https://developer.1password.com/docs/cli/):
+
+| Variable | 1Password Reference |
+|----------|-------------------|
+| `UNIFI_HOST` | `op://Development/UniFi Controller/host` |
+| `UNIFI_API_KEY` | `op://Development/UniFi Controller/api_key` |
+| `UNIFI_USERNAME` | `op://Development/UniFi Controller/username` |
+| `UNIFI_PASSWORD` | `op://Development/UniFi Controller/password` |
+
+This means you can skip setting env vars entirely if you have `op` installed and a service account or session active. The fallback adds ~1-2s to startup and is silently skipped if 1Password is unavailable.
+
 ---
 
 ## Architecture

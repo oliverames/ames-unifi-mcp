@@ -1,6 +1,6 @@
 {
   "name": "ames-unifi-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "UniFi Network MCP server — 310 tools for complete controller management via the Model Context Protocol",
   "keywords": [
     "mcp",

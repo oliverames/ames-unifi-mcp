@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -85,6 +86,20 @@ func Load() (*Config, error) {
 		cfg.PermissionProfile = PermStandard
 	}
 
+	// 1Password fallback for missing credentials
+	if cfg.Host == "" {
+		cfg.Host = opRead("op://Development/UniFi Controller/host")
+	}
+	if cfg.APIKey == "" {
+		cfg.APIKey = opRead("op://Development/UniFi Controller/api_key")
+	}
+	if cfg.Username == "" {
+		cfg.Username = opRead("op://Development/UniFi Controller/username")
+	}
+	if cfg.Password == "" {
+		cfg.Password = opRead("op://Development/UniFi Controller/password")
+	}
+
 	if cfg.Host == "" {
 		return nil, fmt.Errorf("UNIFI_HOST is required")
 	}
@@ -93,6 +108,17 @@ func Load() (*Config, error) {
 	}
 
 	return cfg, nil
+}
+
+// opRead attempts to read a secret from 1Password CLI.
+// Returns empty string if op is unavailable or the item doesn't exist.
+func opRead(ref string) string {
+	cmd := exec.Command("op", "read", ref)
+	out, err := cmd.Output()
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(out))
 }
 
 func envOrDefault(key, fallback string) string {

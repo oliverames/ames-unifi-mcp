@@ -59,6 +59,13 @@ func New(cfg *config.Config) (*Client, error) {
 		httpClient: httpClient,
 	}
 
+	// If unauthenticated (no creds), skip login. The server starts in a
+	// degraded "needs auth" state — tool handlers in main.go short-circuit
+	// before any client method gets called.
+	if cfg.NeedsAuth {
+		return c, nil
+	}
+
 	// If using username/password, login immediately to establish session.
 	if cfg.AuthMethod() == config.AuthUserPass {
 		if err := c.login(context.Background()); err != nil {

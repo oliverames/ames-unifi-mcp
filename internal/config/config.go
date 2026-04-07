@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -39,6 +38,21 @@ type Config struct {
 	ToolMode          ToolMode
 	PermissionProfile PermissionProfile
 	LogLevel          string
+	// NeedsAuth is set when Load() finds no usable credentials. The server
+	// still starts and registers tools, but each tool short-circuits with
+	// an "authentication required" error. This lets the plugin appear
+	// "installed but inactive" instead of erroring on startup.
+	NeedsAuth bool
+}
+
+// AuthHint returns a user-facing message explaining how to configure credentials.
+// Returned by tool handlers when NeedsAuth is true.
+func (c *Config) AuthHint() string {
+	return "UniFi Controller credentials not configured. Either set " +
+		"UNIFI_HOST and UNIFI_API_KEY (or UNIFI_USERNAME+UNIFI_PASSWORD) in " +
+		"the environment, or create a 'UniFi Controller' item in the " +
+		"Development 1Password vault with fields: host, api_key (or " +
+		"username + password)."
 }
 
 func (c *Config) AuthMethod() AuthMethod {
@@ -100,11 +114,11 @@ func Load() (*Config, error) {
 		cfg.Password = opRead("op://Development/UniFi Controller/password")
 	}
 
-	if cfg.Host == "" {
-		return nil, fmt.Errorf("UNIFI_HOST is required")
-	}
-	if cfg.APIKey == "" && (cfg.Username == "" || cfg.Password == "") {
-		return nil, fmt.Errorf("either UNIFI_API_KEY or UNIFI_USERNAME+UNIFI_PASSWORD is required")
+	// Soft-fail: if credentials are missing, mark as NeedsAuth and let the
+	// server start anyway. Tool handlers check this flag and return a
+	// structured "configure me" error instead of running.
+	if cfg.Host == "" || (cfg.APIKey == "" && (cfg.Username == "" || cfg.Password == "")) {
+		cfg.NeedsAuth = true
 	}
 
 	return cfg, nil

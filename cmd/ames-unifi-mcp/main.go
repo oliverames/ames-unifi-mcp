@@ -30,11 +30,20 @@ func main() {
 		log.Fatalf("client: %v", err)
 	}
 
-	// Detect controller version
-	ver, err := version.Detect(context.Background(), c)
-	if err != nil {
-		log.Printf("warning: could not detect controller version: %v (some tools may be unavailable)", err)
+	// Detect controller version. Skip if unauthenticated — the controller
+	// won't respond and the warning would be noise. Tools are still
+	// registered so the plugin appears installed; they'll short-circuit
+	// with an auth-required error at call time.
+	var ver version.Info
+	if cfg.NeedsAuth {
+		log.Printf("UniFi credentials not configured — starting in needs-auth mode (tools will return configure-me error)")
 		ver = version.Info{Raw: "0.0.0"}
+	} else {
+		ver, err = version.Detect(context.Background(), c)
+		if err != nil {
+			log.Printf("warning: could not detect controller version: %v (some tools may be unavailable)", err)
+			ver = version.Info{Raw: "0.0.0"}
+		}
 	}
 
 	// Build registry
@@ -82,9 +91,9 @@ func main() {
 	)
 
 	if cfg.ToolMode == config.ToolModeLazy {
-		registerLazyTools(s, registry)
+		registerLazyTools(s, registry, cfg)
 	} else {
-		registerEagerTools(s, registry)
+		registerEagerTools(s, registry, cfg)
 	}
 
 	// Run stdio transport
@@ -94,7 +103,13 @@ func main() {
 	}
 }
 
-func registerLazyTools(s *server.MCPServer, registry *tools.Registry) {
+// authGate returns a tool result containing the authentication-required
+// hint, used to short-circuit every tool dispatch when cfg.NeedsAuth is set.
+func authGate(cfg *config.Config) *mcp.CallToolResult {
+	return mcp.NewToolResultError(cfg.AuthHint())
+}
+
+func registerLazyTools(s *server.MCPServer, registry *tools.Registry, cfg *config.Config) {
 	// tool_index
 	indexTool := tools.NewMetaToolIndex(registry)
 	s.AddTool(mcp.Tool{
@@ -102,6 +117,9 @@ func registerLazyTools(s *server.MCPServer, registry *tools.Registry) {
 		Description: indexTool.Description(),
 		InputSchema: rawToSchema(indexTool.InputSchema()),
 	}, func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		if cfg.NeedsAuth {
+			return authGate(cfg), nil
+		}
 		input, _ := json.Marshal(req.Params.Arguments)
 		data, err := indexTool.Execute(ctx, input)
 		if err != nil {
@@ -117,6 +135,9 @@ func registerLazyTools(s *server.MCPServer, registry *tools.Registry) {
 		Description: execTool.Description(),
 		InputSchema: rawToSchema(execTool.InputSchema()),
 	}, func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		if cfg.NeedsAuth {
+			return authGate(cfg), nil
+		}
 		input, _ := json.Marshal(req.Params.Arguments)
 		data, err := execTool.Execute(ctx, input)
 		if err != nil {
@@ -132,6 +153,9 @@ func registerLazyTools(s *server.MCPServer, registry *tools.Registry) {
 		Description: batchTool.Description(),
 		InputSchema: rawToSchema(batchTool.InputSchema()),
 	}, func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		if cfg.NeedsAuth {
+			return authGate(cfg), nil
+		}
 		input, _ := json.Marshal(req.Params.Arguments)
 		data, err := batchTool.Execute(ctx, input)
 		if err != nil {
@@ -141,7 +165,7 @@ func registerLazyTools(s *server.MCPServer, registry *tools.Registry) {
 	})
 }
 
-func registerEagerTools(s *server.MCPServer, registry *tools.Registry) {
+func registerEagerTools(s *server.MCPServer, registry *tools.Registry, cfg *config.Config) {
 	for _, t := range registry.All() {
 		tool := t // capture
 		s.AddTool(mcp.Tool{
@@ -149,6 +173,9 @@ func registerEagerTools(s *server.MCPServer, registry *tools.Registry) {
 			Description: tool.Description(),
 			InputSchema: rawToSchema(tool.InputSchema()),
 		}, func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+			if cfg.NeedsAuth {
+				return authGate(cfg), nil
+			}
 			input, _ := json.Marshal(req.Params.Arguments)
 			data, err := tool.Execute(ctx, input)
 			if err != nil {

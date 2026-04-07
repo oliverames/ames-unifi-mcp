@@ -276,7 +276,7 @@ The server covers all three UniFi API layers:
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `UNIFI_HOST` | Yes | &mdash; | Controller URL (`https://192.168.1.1`) |
+| `UNIFI_HOST` | * | &mdash; | Controller URL (`https://192.168.1.1`) |
 | `UNIFI_API_KEY` | * | &mdash; | API key (preferred, requires 9.1.105+) |
 | `UNIFI_USERNAME` | * | &mdash; | Username (if no API key) |
 | `UNIFI_PASSWORD` | * | &mdash; | Password (if no API key) |
@@ -285,7 +285,18 @@ The server covers all three UniFi API layers:
 | `UNIFI_TOOL_MODE` | No | `lazy` | `lazy` (3 meta-tools) or `eager` (all 310 tools) |
 | `UNIFI_PERMISSION_PROFILE` | No | `standard` | `read-only`, `standard`, or `admin` |
 
-<sub>* Either `UNIFI_API_KEY` or both `UNIFI_USERNAME` + `UNIFI_PASSWORD` are required.</sub>
+<sub>* `UNIFI_HOST` plus either `UNIFI_API_KEY` or both `UNIFI_USERNAME` + `UNIFI_PASSWORD` are required for the server to actually call the controller. If they are absent, the server still starts and registers all tools (so the plugin appears installed), but every tool call returns a structured "credentials not configured" error pointing the user at the env vars or 1Password fallback. This lets the connector live in a clean "needs authentication" state instead of a hard startup error.</sub>
+
+### 1Password fallback
+
+If env vars are unset, the server falls back to 1Password CLI (`op read`) using these references:
+
+- `op://Development/UniFi Controller/host`
+- `op://Development/UniFi Controller/api_key`
+- `op://Development/UniFi Controller/username`
+- `op://Development/UniFi Controller/password`
+
+Create a `UniFi Controller` item in your `Development` vault with those fields and the server will resolve credentials at startup with no env vars required. Resolution happens in `internal/config/config.go:opRead` and requires either an interactive `op` session or `OP_SERVICE_ACCOUNT_TOKEN` in the environment.
 
 ### Authentication Methods
 

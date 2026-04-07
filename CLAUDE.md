@@ -36,7 +36,7 @@ internal/
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `UNIFI_HOST` | Yes | — | Controller URL (`https://192.168.1.1`) |
+| `UNIFI_HOST` | * | — | Controller URL (`https://192.168.1.1`) |
 | `UNIFI_API_KEY` | * | — | API key (preferred, requires 9.1.105+) |
 | `UNIFI_USERNAME` | * | — | Username (if no API key) |
 | `UNIFI_PASSWORD` | * | — | Password (if no API key) |
@@ -45,7 +45,7 @@ internal/
 | `UNIFI_TOOL_MODE` | No | `lazy` | `lazy` (3 meta-tools) or `eager` (all 310) |
 | `UNIFI_PERMISSION_PROFILE` | No | `standard` | `read-only`, `standard`, or `admin` |
 
-\* Either `UNIFI_API_KEY` or both `UNIFI_USERNAME` + `UNIFI_PASSWORD` required.
+\* `UNIFI_HOST` plus either `UNIFI_API_KEY` or `UNIFI_USERNAME`+`UNIFI_PASSWORD` are needed to actually call the controller. If absent, `config.Load()` sets `cfg.NeedsAuth = true` instead of hard-failing — server starts, registers tools, and every tool dispatch in `cmd/ames-unifi-mcp/main.go` short-circuits with `cfg.AuthHint()`. Plugin appears installed-but-inactive instead of erroring at startup. Same applies if the 1Password fallback (`op://Development/UniFi Controller/...`) returns nothing.
 
 ## Lazy Mode Architecture
 

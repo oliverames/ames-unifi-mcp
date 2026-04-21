@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="icon.png" width="80" height="80" alt="UniFi">
+  <img src="assets/icon.png" width="80" height="80" alt="UniFi">
 </p>
 
 <h1 align="center">UniFi MCP Server</h1>
@@ -17,12 +17,14 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/ames-unifi-mcp"><img src="https://img.shields.io/npm/v/ames-unifi-mcp?style=flat-square&color=f5a542" alt="npm"></a>
+  <a href="https://github.com/oliverames/ames-unifi-mcp/releases/tag/v1.0.3"><img src="https://img.shields.io/github/v/release/oliverames/ames-unifi-mcp?style=flat-square&color=f5a542&label=MCPB" alt="MCPB release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-f5a542?style=flat-square" alt="License"></a>
   <a href="https://www.buymeacoffee.com/oliverames"><img src="https://img.shields.io/badge/Buy_Me_a_Coffee-support-f5a542?style=flat-square&logo=buy-me-a-coffee&logoColor=white" alt="Buy Me a Coffee"></a>
 </p>
 
 <p align="center">
   <a href="#quick-start">Quick Start</a> &nbsp;&bull;&nbsp;
+  <a href="#install-with-mcpb">MCPB Download</a> &nbsp;&bull;&nbsp;
   <a href="#tool-coverage">Tool Coverage</a> &nbsp;&bull;&nbsp;
   <a href="#architecture">Architecture</a> &nbsp;&bull;&nbsp;
   <a href="#configuration">Configuration</a>
@@ -39,6 +41,14 @@ Managing a UniFi network through natural language means your AI assistant needs 
 Every mutating operation passes through a **confirm gate** that returns a dry-run preview before execution. The assistant sees exactly what will change and asks you before proceeding.
 
 ## Quick Start
+
+### Install with MCPB
+
+For Claude Desktop and other MCPB-compatible clients, download the local bundle from the [v1.0.3 release](https://github.com/oliverames/ames-unifi-mcp/releases/tag/v1.0.3):
+
+[Download `ames-unifi-mcp-1.0.3.mcpb`](https://github.com/oliverames/ames-unifi-mcp/releases/download/v1.0.3/ames-unifi-mcp-1.0.3.mcpb)
+
+The bundle includes the UniFi favicon, production runtime binaries for macOS and Linux, and setup prompts for host, authentication, site, SSL, tool mode, and permission profile.
 
 Add to your MCP client configuration:
 

@@ -1,6 +1,6 @@
 {
   "name": "ames-unifi-mcp",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "UniFi Network MCP server — 310 tools for complete controller management via the Model Context Protocol",
   "keywords": [
     "mcp",
@@ -20,7 +20,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/oliverames/ames-unifi-mcp.git"
+    "url": "git+https://github.com/oliverames/ames-unifi-mcp.git"
   },
   "homepage": "https://github.com/oliverames/ames-unifi-mcp#readme",
   "bugs": {
@@ -30,14 +30,11 @@
     "ames-unifi-mcp": "bin/ames-unifi-mcp"
   },
   "files": [
+    "bin/",
     "dist/",
-    "install.js",
     "README.md",
     "LICENSE"
   ],
-  "scripts": {
-    "postinstall": "node install.js"
-  },
   "os": [
     "darwin",
     "linux"

@@ -8,6 +8,8 @@
 # Build output
 /dist/
 /bin/
+!/bin/
+!/bin/ames-unifi-mcp
 
 # Test
 *.test

@@ -1,0 +1,43 @@
+#!/usr/bin/env node
+
+const { spawn } = require("child_process");
+const path = require("path");
+const os = require("os");
+
+const binaryName = "ames-unifi-mcp";
+
+const platformMap = {
+  "darwin-arm64": `${binaryName}-darwin-arm64`,
+  "darwin-x64": `${binaryName}-darwin-amd64`,
+  "linux-arm64": `${binaryName}-linux-arm64`,
+  "linux-x64": `${binaryName}-linux-amd64`,
+};
+
+const key = `${os.platform()}-${os.arch()}`;
+const platformBinary = platformMap[key];
+
+if (!platformBinary) {
+  console.error(
+    `Unsupported platform: ${key}. Supported: ${Object.keys(platformMap).join(", ")}`
+  );
+  process.exit(1);
+}
+
+const binaryPath = path.join(__dirname, "..", "dist", platformBinary);
+const child = spawn(binaryPath, process.argv.slice(2), {
+  stdio: "inherit",
+});
+
+child.on("error", (error) => {
+  console.error(`Failed to start ${binaryName}: ${error.message}`);
+  process.exit(1);
+});
+
+child.on("exit", (code, signal) => {
+  if (signal) {
+    process.kill(process.pid, signal);
+    return;
+  }
+
+  process.exit(code ?? 0);
+});

@@ -9,12 +9,15 @@ import (
 	"io"
 	"net/http"
 	"net/http/cookiejar"
+	"net/url"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/oliveames/ames-unifi-mcp/internal/config"
 )
+
+const maxResponseBodyBytes int64 = 10 << 20
 
 // Client handles HTTP communication with the UniFi controller.
 // Targets UniFi OS (Dream Machine) — always uses /proxy/network prefix.
@@ -23,7 +26,7 @@ type Client struct {
 	httpClient *http.Client
 	mu         sync.RWMutex // protects csrfToken and loginGen
 	csrfToken  string
-	loginGen   uint64    // incremented on each successful login; used to coalesce concurrent re-logins
+	loginGen   uint64     // incremented on each successful login; used to coalesce concurrent re-logins
 	loginMu    sync.Mutex // serializes re-login attempts
 }
 
@@ -91,6 +94,9 @@ func (c *Client) login(ctx context.Context) error {
 	}
 	req.Header.Set("Content-Type", "application/json")
 
+	if err := c.validateRequestURL(req.URL); err != nil {
+		return err
+	}
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("login request failed: %w", err)
@@ -98,7 +104,7 @@ func (c *Client) login(ctx context.Context) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(resp.Body)
+		respBody, _, _ := readLimitedBody(resp.Body)
 		return fmt.Errorf("login returned %d: %s", resp.StatusCode, string(respBody))
 	}
 
@@ -151,10 +157,13 @@ func (c *Client) Do(ctx context.Context, method, path string, payload interface{
 		return nil, err
 	}
 
-	respBody, err := io.ReadAll(resp.Body)
+	respBody, truncated, err := readLimitedBody(resp.Body)
 	resp.Body.Close()
 	if err != nil {
 		return nil, fmt.Errorf("reading response: %w", err)
+	}
+	if truncated {
+		return nil, fmt.Errorf("response body exceeded %d byte limit", maxResponseBodyBytes)
 	}
 
 	if resp.StatusCode == http.StatusUnauthorized && c.cfg.AuthMethod() == config.AuthUserPass {
@@ -170,8 +179,11 @@ func (c *Client) Do(ctx context.Context, method, path string, payload interface{
 		if err != nil {
 			return nil, err
 		}
-		respBody, _ = io.ReadAll(resp2.Body)
+		respBody, truncated, _ = readLimitedBody(resp2.Body)
 		resp2.Body.Close()
+		if truncated {
+			return nil, fmt.Errorf("response body exceeded %d byte limit after re-login", maxResponseBodyBytes)
+		}
 		if resp2.StatusCode >= 400 {
 			return nil, fmt.Errorf("request failed after re-login (%d): %s", resp2.StatusCode, string(respBody))
 		}
@@ -238,10 +250,13 @@ func (c *Client) DoRaw(ctx context.Context, method, fullURL string, payload inte
 		return nil, err
 	}
 
-	body, err := io.ReadAll(resp.Body)
+	body, truncated, err := readLimitedBody(resp.Body)
 	resp.Body.Close()
 	if err != nil {
 		return nil, fmt.Errorf("reading response: %w", err)
+	}
+	if truncated {
+		return nil, fmt.Errorf("response body exceeded %d byte limit", maxResponseBodyBytes)
 	}
 
 	if resp.StatusCode == http.StatusUnauthorized && c.cfg.AuthMethod() == config.AuthUserPass {
@@ -257,8 +272,11 @@ func (c *Client) DoRaw(ctx context.Context, method, fullURL string, payload inte
 		if err != nil {
 			return nil, err
 		}
-		body, _ = io.ReadAll(resp2.Body)
+		body, truncated, _ = readLimitedBody(resp2.Body)
 		resp2.Body.Close()
+		if truncated {
+			return nil, fmt.Errorf("response body exceeded %d byte limit after re-login", maxResponseBodyBytes)
+		}
 		if resp2.StatusCode >= 400 {
 			return nil, fmt.Errorf("request failed after re-login (%d): %s", resp2.StatusCode, string(body))
 		}
@@ -316,6 +334,9 @@ func (c *Client) doWithRetry(newReq func() (*http.Request, error), maxRetries in
 		if err != nil {
 			return nil, fmt.Errorf("creating request: %w", err)
 		}
+		if err := c.validateRequestURL(req.URL); err != nil {
+			return nil, err
+		}
 		resp, err := c.httpClient.Do(req)
 		if err != nil {
 			lastErr = err
@@ -330,6 +351,36 @@ func (c *Client) doWithRetry(newReq func() (*http.Request, error), maxRetries in
 		return resp, nil
 	}
 	return nil, fmt.Errorf("request failed after %d retries: %w", maxRetries, lastErr)
+}
+
+func readLimitedBody(r io.Reader) ([]byte, bool, error) {
+	body, err := io.ReadAll(io.LimitReader(r, maxResponseBodyBytes+1))
+	if err != nil {
+		return nil, false, err
+	}
+	if int64(len(body)) > maxResponseBodyBytes {
+		return body[:maxResponseBodyBytes], true, nil
+	}
+	return body, false, nil
+}
+
+func (c *Client) validateRequestURL(u *url.URL) error {
+	if u == nil || u.Host == "" {
+		return fmt.Errorf("refusing request with empty URL host")
+	}
+	if u.Scheme != "http" && u.Scheme != "https" {
+		return fmt.Errorf("refusing request with unsupported URL scheme %q", u.Scheme)
+	}
+
+	hostURL, err := url.Parse(c.cfg.Host)
+	if err == nil && strings.EqualFold(u.Host, hostURL.Host) {
+		return nil
+	}
+	cloudURL, err := url.Parse(c.cfg.CloudBaseURL())
+	if err == nil && strings.EqualFold(u.Host, cloudURL.Host) {
+		return nil
+	}
+	return fmt.Errorf("refusing request to unexpected host %q", u.Host)
 }
 
 // Site returns the configured site name.

@@ -1,0 +1,123 @@
+{
+  "manifest_version": "0.3",
+  "name": "ames-unifi-mcp",
+  "display_name": "UniFi MCP Server",
+  "version": "0.0.0",
+  "description": "UniFi Network MCP server for complete controller management via the Model Context Protocol",
+  "author": {
+    "name": "Oliver Ames",
+    "url": "https://github.com/oliverames"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oliverames/ames-unifi-mcp.git"
+  },
+  "homepage": "https://github.com/oliverames/ames-unifi-mcp#readme",
+  "documentation": "https://github.com/oliverames/ames-unifi-mcp#readme",
+  "support": "https://github.com/oliverames/ames-unifi-mcp/issues",
+  "icon": "assets/icon.png",
+  "server": {
+    "type": "node",
+    "entry_point": "server/launch.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/server/launch.js"
+      ],
+      "env": {
+        "UNIFI_HOST": "${user_config.unifi_host}",
+        "UNIFI_API_KEY": "${user_config.unifi_api_key}",
+        "UNIFI_USERNAME": "${user_config.unifi_username}",
+        "UNIFI_PASSWORD": "${user_config.unifi_password}",
+        "UNIFI_SITE": "${user_config.unifi_site}",
+        "UNIFI_VERIFY_SSL": "${user_config.unifi_verify_ssl}",
+        "UNIFI_TOOL_MODE": "${user_config.unifi_tool_mode}",
+        "UNIFI_PERMISSION_PROFILE": "${user_config.unifi_permission_profile}"
+      }
+    }
+  },
+  "tools_generated": true,
+  "keywords": [
+    "mcp",
+    "unifi",
+    "ubiquiti",
+    "network",
+    "model-context-protocol",
+    "dream-machine",
+    "cloud-gateway",
+    "firewall",
+    "wifi",
+    "ai",
+    "claude",
+    "llm"
+  ],
+  "license": "MIT",
+  "privacy_policies": [
+    "https://www.ui.com/legal/privacypolicy/"
+  ],
+  "compatibility": {
+    "platforms": [
+      "darwin",
+      "linux"
+    ],
+    "runtimes": {
+      "node": ">=16.0.0"
+    }
+  },
+  "user_config": {
+    "unifi_host": {
+      "type": "string",
+      "title": "UniFi Host",
+      "description": "UniFi OS host URL, for example https://192.168.1.1 or https://unifi.ui.com.",
+      "required": true
+    },
+    "unifi_api_key": {
+      "type": "string",
+      "title": "UniFi API Key",
+      "description": "UniFi API key. Use this or username/password.",
+      "required": false,
+      "sensitive": true
+    },
+    "unifi_username": {
+      "type": "string",
+      "title": "UniFi Username",
+      "description": "Optional username when not using an API key.",
+      "required": false
+    },
+    "unifi_password": {
+      "type": "string",
+      "title": "UniFi Password",
+      "description": "Optional password when not using an API key.",
+      "required": false,
+      "sensitive": true
+    },
+    "unifi_site": {
+      "type": "string",
+      "title": "UniFi Site",
+      "description": "UniFi site identifier.",
+      "required": false,
+      "default": "default"
+    },
+    "unifi_verify_ssl": {
+      "type": "boolean",
+      "title": "Verify SSL",
+      "description": "Verify TLS certificates when connecting to the controller.",
+      "required": false,
+      "default": true
+    },
+    "unifi_tool_mode": {
+      "type": "string",
+      "title": "Tool Mode",
+      "description": "Use lazy for meta-tools or eager to expose all tools.",
+      "required": false,
+      "default": "lazy"
+    },
+    "unifi_permission_profile": {
+      "type": "string",
+      "title": "Permission Profile",
+      "description": "Permission profile: read-only, standard, or admin.",
+      "required": false,
+      "default": "standard"
+    }
+  }
+}

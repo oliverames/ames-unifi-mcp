@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
 )
@@ -22,12 +23,12 @@ func WithConfirm(t Tool) Tool {
 	return &ConfirmGate{inner: t}
 }
 
-func (g *ConfirmGate) Name() string              { return g.inner.Name() }
+func (g *ConfirmGate) Name() string                   { return g.inner.Name() }
 func (g *ConfirmGate) Category() permissions.Category { return g.inner.Category() }
-func (g *ConfirmGate) Action() permissions.Action { return g.inner.Action() }
-func (g *ConfirmGate) IsMutating() bool           { return true }
-func (g *ConfirmGate) MinVersion() string         { return g.inner.MinVersion() }
-func (g *ConfirmGate) IsUndocumented() bool       { return g.inner.IsUndocumented() }
+func (g *ConfirmGate) Action() permissions.Action     { return g.inner.Action() }
+func (g *ConfirmGate) IsMutating() bool               { return true }
+func (g *ConfirmGate) MinVersion() string             { return g.inner.MinVersion() }
+func (g *ConfirmGate) IsUndocumented() bool           { return g.inner.IsUndocumented() }
 
 func (g *ConfirmGate) Description() string {
 	return g.inner.Description() + " (requires confirm=true to execute; omit for dry-run preview)"
@@ -69,7 +70,7 @@ func (g *ConfirmGate) Execute(ctx context.Context, input json.RawMessage) (json.
 			"description":           g.inner.Description(),
 			"requires_confirmation": true,
 			"message":               fmt.Sprintf("This operation would execute %s. Set confirm=true to proceed.", g.inner.Name()),
-			"parameters":            params,
+			"parameters":            redactSensitive(params),
 		}
 		return json.Marshal(preview)
 	}
@@ -78,4 +79,47 @@ func (g *ConfirmGate) Execute(ctx context.Context, input json.RawMessage) (json.
 	delete(params, "confirm")
 	cleaned, _ := json.Marshal(params)
 	return g.inner.Execute(ctx, cleaned)
+}
+
+func redactSensitive(value interface{}) interface{} {
+	switch v := value.(type) {
+	case map[string]interface{}:
+		redacted := make(map[string]interface{}, len(v))
+		for key, nested := range v {
+			if isSensitiveKey(key) {
+				redacted[key] = "[REDACTED]"
+				continue
+			}
+			redacted[key] = redactSensitive(nested)
+		}
+		return redacted
+	case []interface{}:
+		redacted := make([]interface{}, len(v))
+		for i, nested := range v {
+			redacted[i] = redactSensitive(nested)
+		}
+		return redacted
+	default:
+		return value
+	}
+}
+
+func isSensitiveKey(key string) bool {
+	normalized := strings.NewReplacer("-", "", "_", "", " ", "").Replace(strings.ToLower(key))
+	for _, marker := range []string{
+		"apikey",
+		"authorization",
+		"cookie",
+		"credential",
+		"passphrase",
+		"password",
+		"secret",
+		"token",
+		"xpassword",
+	} {
+		if strings.Contains(normalized, marker) {
+			return true
+		}
+	}
+	return false
 }

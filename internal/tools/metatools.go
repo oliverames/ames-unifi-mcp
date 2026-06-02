@@ -8,6 +8,8 @@ import (
 	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
 )
 
+const maxBatchCalls = 25
+
 // MetaToolIndex is the lazy-mode tool that returns the tool catalog.
 type MetaToolIndex struct {
 	registry *Registry
@@ -17,15 +19,15 @@ func NewMetaToolIndex(r *Registry) *MetaToolIndex {
 	return &MetaToolIndex{registry: r}
 }
 
-func (m *MetaToolIndex) Name() string        { return "tool_index" }
+func (m *MetaToolIndex) Name() string { return "tool_index" }
 func (m *MetaToolIndex) Description() string {
 	return "List all available UniFi tools. Optionally filter by category (devices, clients, networks, wlan, firewall, vpn, routing, qos, stats, events, system, hotspot, poe, dpi, backup, settings)."
 }
 func (m *MetaToolIndex) Category() permissions.Category { return CatSystem }
 func (m *MetaToolIndex) Action() permissions.Action     { return permissions.ActionRead }
 func (m *MetaToolIndex) IsMutating() bool               { return false }
-func (m *MetaToolIndex) MinVersion() string              { return "" }
-func (m *MetaToolIndex) IsUndocumented() bool            { return false }
+func (m *MetaToolIndex) MinVersion() string             { return "" }
+func (m *MetaToolIndex) IsUndocumented() bool           { return false }
 
 func (m *MetaToolIndex) InputSchema() json.RawMessage {
 	return json.RawMessage(`{
@@ -59,15 +61,15 @@ func NewMetaToolExecute(r *Registry) *MetaToolExecute {
 	return &MetaToolExecute{registry: r}
 }
 
-func (m *MetaToolExecute) Name() string        { return "tool_execute" }
+func (m *MetaToolExecute) Name() string { return "tool_execute" }
 func (m *MetaToolExecute) Description() string {
 	return "Execute a UniFi tool by name. Use tool_index first to discover available tools and their input schemas."
 }
 func (m *MetaToolExecute) Category() permissions.Category { return CatSystem }
 func (m *MetaToolExecute) Action() permissions.Action     { return permissions.ActionRead }
 func (m *MetaToolExecute) IsMutating() bool               { return false }
-func (m *MetaToolExecute) MinVersion() string              { return "" }
-func (m *MetaToolExecute) IsUndocumented() bool            { return false }
+func (m *MetaToolExecute) MinVersion() string             { return "" }
+func (m *MetaToolExecute) IsUndocumented() bool           { return false }
 
 func (m *MetaToolExecute) InputSchema() json.RawMessage {
 	return json.RawMessage(`{
@@ -109,15 +111,15 @@ func NewMetaToolBatch(r *Registry) *MetaToolBatch {
 	return &MetaToolBatch{registry: r}
 }
 
-func (m *MetaToolBatch) Name() string        { return "tool_batch" }
+func (m *MetaToolBatch) Name() string { return "tool_batch" }
 func (m *MetaToolBatch) Description() string {
 	return "Execute multiple UniFi tools in parallel. Returns results for each tool call."
 }
 func (m *MetaToolBatch) Category() permissions.Category { return CatSystem }
 func (m *MetaToolBatch) Action() permissions.Action     { return permissions.ActionRead }
 func (m *MetaToolBatch) IsMutating() bool               { return false }
-func (m *MetaToolBatch) MinVersion() string              { return "" }
-func (m *MetaToolBatch) IsUndocumented() bool            { return false }
+func (m *MetaToolBatch) MinVersion() string             { return "" }
+func (m *MetaToolBatch) IsUndocumented() bool           { return false }
 
 func (m *MetaToolBatch) InputSchema() json.RawMessage {
 	return json.RawMessage(`{
@@ -146,6 +148,9 @@ func (m *MetaToolBatch) Execute(ctx context.Context, input json.RawMessage) (jso
 	}
 	if err := json.Unmarshal(input, &params); err != nil {
 		return nil, fmt.Errorf("parsing input: %w", err)
+	}
+	if len(params.Calls) > maxBatchCalls {
+		return nil, fmt.Errorf("too many batch calls: got %d, max %d", len(params.Calls), maxBatchCalls)
 	}
 	results := m.registry.Batch(ctx, params.Calls)
 	return json.Marshal(results)

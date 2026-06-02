@@ -10,6 +10,7 @@ import (
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 
+	"github.com/oliveames/ames-unifi-mcp/internal/buildinfo"
 	"github.com/oliveames/ames-unifi-mcp/internal/client"
 	"github.com/oliveames/ames-unifi-mcp/internal/config"
 	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
@@ -86,7 +87,7 @@ func main() {
 	// Create MCP server
 	s := server.NewMCPServer(
 		"ames-unifi-mcp",
-		"1.0.0",
+		buildinfo.Version,
 		server.WithToolCapabilities(true),
 	)
 

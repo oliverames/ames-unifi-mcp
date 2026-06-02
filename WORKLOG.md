@@ -1,5 +1,15 @@
 # Worklog
 
+## 2026-06-02 — v1.0.6 hardening and reproducible MCPB release
+
+**What changed**: Hardened request handling and packaging before the MCPB release. `UNIFI_HOST` is now validated as an http/https origin with no embedded credentials, query, fragment, or application path. `UNIFI_SITE` is restricted to site identifiers using letters, numbers, underscores, and hyphens. `UNIFI_VERIFY_SSL` parsing now defaults safely instead of treating typos as false. HTTP requests are restricted to the configured UniFi controller host or `api.ui.com`, and response bodies are capped at 10 MiB. Mutating-tool dry-run previews now redact sensitive fields before echoing parameters. `tool_batch` now rejects batches larger than 25 calls. Release binaries now advertise the package version through `internal/buildinfo`.
+
+**MCPB packaging**: Added tracked MCPB source files under `mcpb/`, plus `scripts/build-mcpb.mjs` and a `make mcpb` target. The script stages README/LICENSE/icons, the Node launcher, and the four release binaries; updates manifest version/description from `package.json`; validates the manifest with `@anthropic-ai/mcpb`; and packs `dist/ames-unifi-mcp-<version>.mcpb`.
+
+**Verification**: Re-run before release: official Network API endpoint coverage, `go test -race -cover ./...`, `govulncheck ./...`, MCP lazy/eager smoke tests, `make mcpb`, MCPB manifest validation, MCPB info, npm dry-run, and GitHub release asset upload. No MCPB/DXT signing identity was present in the Development vault item list, so the MCPB remains unsigned like the previous v1.0.3 bundle instead of using a throwaway self-signed identity.
+
+---
+
 ## 2026-06-02 — Official Network API coverage audit
 
 **What changed**: Checked the current UniFi Network API documentation at `developer.ui.com/network/v10.3.58` against the MCP tool registry. The audit initially flagged network references, RADIUS profile overview, and device tag overview because their implemented tool names live under `system_*` rather than the API section names. After tracing the actual handlers, all three were already implemented as `system_network_references`, `system_radius_profiles_v2`, and `system_device_tags`. No runtime tool additions were needed. Updated the README coverage table to use the actual 310-tool registry category counts.

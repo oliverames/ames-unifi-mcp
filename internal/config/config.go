@@ -1,10 +1,15 @@
 package config
 
 import (
+	"fmt"
+	"net/url"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 )
+
+var siteIDPattern = regexp.MustCompile(`^[A-Za-z0-9_-]+$`)
 
 type AuthMethod int
 
@@ -80,7 +85,7 @@ func Load() (*Config, error) {
 		Username:  os.Getenv("UNIFI_USERNAME"),
 		Password:  os.Getenv("UNIFI_PASSWORD"),
 		Site:      envOrDefault("UNIFI_SITE", "default"),
-		VerifySSL: envOrDefault("UNIFI_VERIFY_SSL", "true") == "true",
+		VerifySSL: parseBoolDefault(os.Getenv("UNIFI_VERIFY_SSL"), true),
 		LogLevel:  envOrDefault("UNIFI_LOG_LEVEL", "error"),
 	}
 
@@ -107,11 +112,13 @@ func Load() (*Config, error) {
 	if cfg.APIKey == "" {
 		cfg.APIKey = opRead("op://Development/UniFi Controller/api_key")
 	}
-	if cfg.Username == "" {
-		cfg.Username = opRead("op://Development/UniFi Controller/username")
-	}
-	if cfg.Password == "" {
-		cfg.Password = opRead("op://Development/UniFi Controller/password")
+	if cfg.APIKey == "" {
+		if cfg.Username == "" {
+			cfg.Username = opRead("op://Development/UniFi Controller/username")
+		}
+		if cfg.Password == "" {
+			cfg.Password = opRead("op://Development/UniFi Controller/password")
+		}
 	}
 
 	// Soft-fail: if credentials are missing, mark as NeedsAuth and let the
@@ -119,6 +126,15 @@ func Load() (*Config, error) {
 	// structured "configure me" error instead of running.
 	if cfg.Host == "" || (cfg.APIKey == "" && (cfg.Username == "" || cfg.Password == "")) {
 		cfg.NeedsAuth = true
+	}
+
+	if cfg.Host != "" {
+		if err := validateHost(cfg.Host); err != nil {
+			return nil, err
+		}
+	}
+	if !siteIDPattern.MatchString(cfg.Site) {
+		return nil, fmt.Errorf("invalid UNIFI_SITE %q: use a site identifier containing only letters, numbers, underscores, or hyphens", cfg.Site)
 	}
 
 	return cfg, nil
@@ -140,4 +156,40 @@ func envOrDefault(key, fallback string) string {
 		return v
 	}
 	return fallback
+}
+
+func parseBoolDefault(value string, fallback bool) bool {
+	switch strings.ToLower(strings.TrimSpace(value)) {
+	case "":
+		return fallback
+	case "1", "true", "t", "yes", "y", "on":
+		return true
+	case "0", "false", "f", "no", "n", "off":
+		return false
+	default:
+		return fallback
+	}
+}
+
+func validateHost(host string) error {
+	u, err := url.Parse(host)
+	if err != nil {
+		return fmt.Errorf("invalid UNIFI_HOST: %w", err)
+	}
+	if u.Scheme != "http" && u.Scheme != "https" {
+		return fmt.Errorf("invalid UNIFI_HOST %q: scheme must be http or https", host)
+	}
+	if u.Host == "" {
+		return fmt.Errorf("invalid UNIFI_HOST %q: missing host", host)
+	}
+	if u.User != nil {
+		return fmt.Errorf("invalid UNIFI_HOST %q: credentials must be provided through UNIFI_API_KEY or UNIFI_USERNAME/UNIFI_PASSWORD, not embedded in the URL", host)
+	}
+	if u.RawQuery != "" || u.Fragment != "" {
+		return fmt.Errorf("invalid UNIFI_HOST %q: query strings and fragments are not allowed", host)
+	}
+	if u.Path != "" && u.Path != "/" {
+		return fmt.Errorf("invalid UNIFI_HOST %q: provide only the UniFi OS origin, not an application path", host)
+	}
+	return nil
 }

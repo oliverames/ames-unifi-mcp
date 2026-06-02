@@ -1,17 +1,21 @@
 BINARY=ames-unifi-mcp
 MODULE=github.com/oliveames/ames-unifi-mcp
-VERSION=$(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
+VERSION=$(shell node -p "require('./package.json').version" 2>/dev/null || git describe --tags --always --dirty 2>/dev/null || echo "dev")
+LDFLAGS=-s -w -X $(MODULE)/internal/buildinfo.Version=$(VERSION)
 
-.PHONY: build build-all test lint clean docker research
+.PHONY: build build-all mcpb test lint clean docker research
 
 build:
-	go build -ldflags "-s -w" -o $(BINARY) ./cmd/ames-unifi-mcp/
+	go build -ldflags "$(LDFLAGS)" -o $(BINARY) ./cmd/ames-unifi-mcp/
 
 build-all:
-	GOOS=darwin GOARCH=arm64 go build -ldflags "-s -w" -o dist/$(BINARY)-darwin-arm64 ./cmd/ames-unifi-mcp/
-	GOOS=darwin GOARCH=amd64 go build -ldflags "-s -w" -o dist/$(BINARY)-darwin-amd64 ./cmd/ames-unifi-mcp/
-	GOOS=linux GOARCH=arm64 go build -ldflags "-s -w" -o dist/$(BINARY)-linux-arm64 ./cmd/ames-unifi-mcp/
-	GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o dist/$(BINARY)-linux-amd64 ./cmd/ames-unifi-mcp/
+	GOOS=darwin GOARCH=arm64 go build -ldflags "$(LDFLAGS)" -o dist/$(BINARY)-darwin-arm64 ./cmd/ames-unifi-mcp/
+	GOOS=darwin GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o dist/$(BINARY)-darwin-amd64 ./cmd/ames-unifi-mcp/
+	GOOS=linux GOARCH=arm64 go build -ldflags "$(LDFLAGS)" -o dist/$(BINARY)-linux-arm64 ./cmd/ames-unifi-mcp/
+	GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o dist/$(BINARY)-linux-amd64 ./cmd/ames-unifi-mcp/
+
+mcpb: build-all
+	node scripts/build-mcpb.mjs
 
 test:
 	go test -race -cover ./...

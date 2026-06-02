@@ -1,6 +1,6 @@
 {
   "name": "ames-unifi-mcp",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "UniFi Network MCP server — 310 tools for complete controller management via the Model Context Protocol",
   "keywords": [
     "mcp",
@@ -30,8 +30,11 @@
     "ames-unifi-mcp": "bin/ames-unifi-mcp"
   },
   "files": [
-    "bin/",
-    "dist/",
+    "bin/ames-unifi-mcp",
+    "dist/ames-unifi-mcp-darwin-arm64",
+    "dist/ames-unifi-mcp-darwin-amd64",
+    "dist/ames-unifi-mcp-linux-arm64",
+    "dist/ames-unifi-mcp-linux-amd64",
     "README.md",
     "LICENSE"
   ],

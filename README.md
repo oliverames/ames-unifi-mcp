@@ -136,7 +136,7 @@ If a tool isn't in the index, the controller firmware is too old to support it.
 <tr>
 <td width="50%" valign="top">
 
-**Devices** &mdash; 29 tools
+**Devices** &mdash; 63 tools
 ```
 device_list          device_restart
 device_get           device_adopt
@@ -146,9 +146,12 @@ device_spectrum_scan device_rolling_upgrade_*
 device_migrate       device_port_action
 device_list_v2       device_stats_latest
 device_unadopt       device_pending_list
+system_device_tags   system_tag_*
+switching_stack_*    switching_lag_*
+switching_mclag_*    cloud_device_list
 ```
 
-**Clients** &mdash; 15 tools
+**Clients** &mdash; 16 tools
 ```
 client_list_active   client_block/unblock
 client_get           client_reconnect
@@ -157,48 +160,43 @@ client_rename        client_update
 client_list_v2       client_action
 ```
 
-**Networks** &mdash; 10 tools
+**Networks** &mdash; 39 tools
 ```
-network_list    network_create
-network_get     network_update
-network_delete  network_*_v2 (Integration API)
+network_list           network_create
+network_get            network_update
+network_delete         network_*_v2
+system_network_references
+system_radius_profiles_v2
+dns_policy_*           system_portprofile_*
 ```
 
-**Wireless (WLAN + WiFi)** &mdash; 12 tools
+**Wireless (WLAN + WiFi)** &mdash; 14 tools
 ```
 wlan_list       wlan_create/update/delete
 wlan_enable     wlan_disable
 wifi_broadcast_list/get/create/update/delete
 ```
 
-**Firewall** &mdash; 23 tools
+**Firewall** &mdash; 30 tools
 ```
 firewall_rule_*      (legacy CRUD)
 firewall_group_*     (address/port groups)
 firewall_zone_*      (ZBF zones, 9.0+)
 firewall_policy_*    (ZBF policies + ordering)
+acl_rule_*            acl_rule_ordering_*
 ```
 
-**ACL Rules** &mdash; 7 tools
+**QoS** &mdash; 10 tools
 ```
-acl_rule_list/get/create/update/delete
-acl_rule_ordering_get/set
-```
-
-**DNS Policies** &mdash; 5 tools
-```
-dns_policy_list/get/create/update/delete
-```
-
-**Traffic & QoS** &mdash; 15 tools
-```
-traffic_rule_*           (v2 API rules)
-traffic_route_*          (v2 API routes)
 traffic_matching_list_*  (10.0+)
 ```
 
-</td>
-<td width="50%" valign="top">
+**Routing** &mdash; 10 tools
+```
+traffic_rule_*           (v2 API rules)
+traffic_route_*          (v2 API routes)
+system_static_route_*
+```
 
 **VPN** &mdash; 10 tools
 ```
@@ -206,63 +204,63 @@ vpn_server_list/get/create/update/delete
 vpn_tunnel_list/get/create/update/delete
 ```
 
-**Switching** &mdash; 15 tools
-```
-switching_stack_*    (switch stacks)
-switching_lag_*      (link aggregation)
-switching_mclag_*    (MC-LAG domains)
-```
+</td>
+<td width="50%" valign="top">
 
-**Stats & DPI** &mdash; 24 tools
+**Stats** &mdash; 20 tools
 ```
 stats_site_health    stats_sysinfo
 stats_dashboard      stats_report
 stats_speedtest_*    stats_ips_events
 stats_rogueap        stats_spectrumscan
-stats_dpi_site       stats_dpi_client
-stats_dpi_apps       stats_dpi_categories
 ```
 
-**Events & Alarms** &mdash; 5 tools
+**DPI** &mdash; 11 tools
+```
+stats_dpi_site       stats_dpi_client
+stats_dpi_apps       stats_dpi_categories
+misc_dpigroup_*
+```
+
+**Events** &mdash; 8 tools
 ```
 event_list           alarm_list
 alarm_count          alarm_archive
 alarm_archive_all
 ```
 
-**Hotspot & Guests** &mdash; 13 tools
+**Hotspot** &mdash; 27 tools
 ```
 hotspot_authorize/unauthorize_guest
 hotspot_create_voucher  hotspot_extend
 hotspot_voucher_*_v2    (Integration API)
 hotspot_config          hotspot_packages
+misc_hotspotop_*        hotspot_2_0_package_*
 ```
 
-**System & Settings** &mdash; 53 tools
+**System** &mdash; 27 tools
 ```
 system_reboot/poweroff  system_settings
-system_backup_*         system_firmware_*
-system_port_forward_*   system_static_route_*
-system_usergroup_*      system_portprofile_*
-system_dhcpoption_*     system_radiusprofile_*
-system_tag_*            system_led_toggle
+system_firmware_*       admin_site_*
+admin_invite/revoke     cloud_host_list/get
+cloud_site_list         cloud_sdwan_*
 ```
 
-**Cloud API** &mdash; 9 tools
+**Settings** &mdash; 19 tools
 ```
-cloud_host_list/get     cloud_site_list
-cloud_device_list       cloud_isp_metrics
-cloud_sdwan_*
+system_setting_*     system_led_toggle
+system_ips_update    misc_scheduletask_*
+misc_cnt_resource
 ```
 
-**Admin & Misc** &mdash; 56 tools
+**Backup** &mdash; 5 tools
 ```
-admin_site_create/delete/rename
-admin_invite/revoke/grant/update
-poe_power_cycle         syslog_query
-apgroup_*               misc_rogueknown_*
-misc_scheduletask_*     misc_hotspotop_*
-misc_dpigroup_*         misc_cnt_resource
+system_backup_*      backup_restore
+```
+
+**PoE** &mdash; 1 tool
+```
+poe_power_cycle
 ```
 
 </td>

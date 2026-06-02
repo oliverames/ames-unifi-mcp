@@ -1,5 +1,15 @@
 # Worklog
 
+## 2026-06-02 — Official Network API coverage audit
+
+**What changed**: Checked the current UniFi Network API documentation at `developer.ui.com/network/v10.3.58` against the MCP tool registry. The audit initially flagged network references, RADIUS profile overview, and device tag overview because their implemented tool names live under `system_*` rather than the API section names. After tracing the actual handlers, all three were already implemented as `system_network_references`, `system_radius_profiles_v2`, and `system_device_tags`. No runtime tool additions were needed. Updated the README coverage table to use the actual 310-tool registry category counts.
+
+**Verification**: `go test ./...` passed. A docs-to-registry coverage script reported 73/73 official Network API endpoint docs covered. MCP lazy-mode `tool_index` against a fake Network 10.3.58 controller reported 310 tools. `npm publish --dry-run` for `ames-unifi-mcp@1.0.5` succeeded.
+
+**Left off at**: `npm publish` is still blocked by npm authentication returning E401, so npm still needs a refreshed auth token before v1.0.5 can be published. v1.0.5 is the npm bin packaging fix that makes `npx -y ames-unifi-mcp@latest` install a callable binary.
+
+---
+
 ## 2026-04-07 — Soft-fail on missing creds: needs-auth state replaces hard startup error
 
 **What changed**: Refactored `internal/config/config.go` to detect missing credentials and set `cfg.NeedsAuth = true` instead of returning an error from `Load()`. Added `Config.AuthHint()` returning a user-facing configure-me message. Updated `internal/client/client.go` to skip the `login()` call when `NeedsAuth` (would otherwise crash on empty `cfg.Host`). Updated `cmd/ames-unifi-mcp/main.go` to skip controller version detection when `NeedsAuth`, and to wrap every tool dispatch (lazy meta-tools and eager all-tools paths) with a `cfg.NeedsAuth` check that short-circuits to `cfg.AuthHint()` as a structured `isError: true` MCP result before any client method runs. Added `authGate()` helper. Verified end-to-end via raw JSON-RPC stdio smoke test: server initializes cleanly, `tools/list` returns the three meta-tools, `tools/call` returns the auth hint as `isError`. All existing tests still pass. Updated `README.md` "Configuration" section and `CLAUDE.md` env vars table to document the new joint-optional credential contract and the soft-fail behavior. Bumped to v1.0.3, built all four platform binaries via `make build-all`, published `ames-unifi-mcp@1.0.3` to npm. Postpublish hook auto-bumped `ames-original-connectors` to 1.2.13 in the ames-plugins marketplace.

@@ -4,7 +4,7 @@ Thanks for helping improve the UniFi MCP server.
 
 ## Before you start
 
-- Use Go 1.26.1 or newer and Node.js 22 or newer.
+- Use Go 1.26.5 or newer and Node.js 22 or newer.
 - Open an issue before making a large API or architecture change.
 - Read `docs/api-research.md` before adding a tool. Update that file when an endpoint, version requirement, or controller behavior changes.
 - Keep mutating tools behind the existing confirmation gate.

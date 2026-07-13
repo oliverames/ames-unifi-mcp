@@ -14,7 +14,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/config"
+	"github.com/oliverames/ames-unifi-mcp/internal/config"
 )
 
 const maxResponseBodyBytes int64 = 10 << 20

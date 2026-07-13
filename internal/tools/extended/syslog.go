@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/client"
-	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
-	"github.com/oliveames/ames-unifi-mcp/internal/tools/core"
+	"github.com/oliverames/ames-unifi-mcp/internal/client"
+	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
+	"github.com/oliverames/ames-unifi-mcp/internal/tools/core"
 )
 
 func BuildSyslogTools(c *client.Client) []*core.BaseTool {
@@ -52,7 +52,9 @@ func BuildSyslogTools(c *client.Client) []*core.BaseTool {
 			}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Source string `json:"source"` }
+				var p struct {
+					Source string `json:"source"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "GET", "v2/api/fingerprint_devices/"+p.Source, nil)
 			},

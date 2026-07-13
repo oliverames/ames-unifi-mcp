@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/client"
-	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
+	"github.com/oliverames/ames-unifi-mcp/internal/client"
+	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
 )
 
 func BuildWLANTools(c *client.Client) []*BaseTool {
@@ -26,7 +26,9 @@ func BuildWLANTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatWLAN, ToolAction: permissions.ActionRead,
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "GET", sp()+"/rest/wlanconf/"+p.ID, nil)
 			},
@@ -43,7 +45,9 @@ func BuildWLANTools(c *client.Client) []*BaseTool {
 			}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/rest/wlanconf", p.Config)
 			},
@@ -74,7 +78,9 @@ func BuildWLANTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatWLAN, ToolAction: permissions.ActionDelete, Mutating: true,
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "DELETE", sp()+"/rest/wlanconf/"+p.ID, nil)
 			},
@@ -84,7 +90,9 @@ func BuildWLANTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatWLAN, ToolAction: permissions.ActionUpdate, Mutating: true,
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "PUT", sp()+"/rest/wlanconf/"+p.ID, map[string]interface{}{"enabled": true})
 			},
@@ -94,7 +102,9 @@ func BuildWLANTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatWLAN, ToolAction: permissions.ActionUpdate, Mutating: true,
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "PUT", sp()+"/rest/wlanconf/"+p.ID, map[string]interface{}{"enabled": false})
 			},

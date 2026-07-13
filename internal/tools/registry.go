@@ -7,8 +7,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
-	"github.com/oliveames/ames-unifi-mcp/internal/version"
+	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
+	"github.com/oliverames/ames-unifi-mcp/internal/version"
 )
 
 // Registry holds all registered tools and provides lookup/dispatch.

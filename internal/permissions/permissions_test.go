@@ -3,7 +3,7 @@ package permissions
 import (
 	"testing"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/config"
+	"github.com/oliverames/ames-unifi-mcp/internal/config"
 )
 
 func TestReadOnly(t *testing.T) {

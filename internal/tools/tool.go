@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
+	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
 )
 
 // Tool defines the interface every tool must implement.
@@ -39,12 +39,12 @@ type Tool interface {
 
 // ToolMeta holds metadata for the tool index.
 type ToolMeta struct {
-	Name           string              `json:"name"`
-	Description    string              `json:"description"`
-	Category       permissions.Category `json:"category"`
-	Mutating       bool                `json:"mutating"`
-	MinVersion     string              `json:"min_version,omitempty"`
-	Undocumented   bool                `json:"undocumented,omitempty"`
+	Name         string               `json:"name"`
+	Description  string               `json:"description"`
+	Category     permissions.Category `json:"category"`
+	Mutating     bool                 `json:"mutating"`
+	MinVersion   string               `json:"min_version,omitempty"`
+	Undocumented bool                 `json:"undocumented,omitempty"`
 }
 
 // MetaFromTool extracts index metadata from a Tool.

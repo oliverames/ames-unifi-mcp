@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/config"
-	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
-	"github.com/oliveames/ames-unifi-mcp/internal/version"
+	"github.com/oliverames/ames-unifi-mcp/internal/config"
+	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
+	"github.com/oliverames/ames-unifi-mcp/internal/version"
 )
 
 func TestMetaToolBatchRejectsOversizedBatch(t *testing.T) {

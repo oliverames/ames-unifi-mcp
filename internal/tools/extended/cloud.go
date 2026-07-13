@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/client"
-	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
-	"github.com/oliveames/ames-unifi-mcp/internal/tools/core"
+	"github.com/oliverames/ames-unifi-mcp/internal/client"
+	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
+	"github.com/oliverames/ames-unifi-mcp/internal/tools/core"
 )
 
 func BuildCloudTools(c *client.Client) []*core.BaseTool {
@@ -50,7 +50,9 @@ func BuildCloudTools(c *client.Client) []*core.BaseTool {
 			ToolCategory: permissions.CatSystem, ToolAction: permissions.ActionRead,
 			Schema: core.IDSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, http.MethodGet, baseURL+"/v1/hosts/"+p.ID, nil)
 			},
@@ -88,7 +90,9 @@ func BuildCloudTools(c *client.Client) []*core.BaseTool {
 			}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ HostIDs []string `json:"hostIds"` }
+				var p struct {
+					HostIDs []string `json:"hostIds"`
+				}
 				json.Unmarshal(input, &p)
 				u := baseURL + "/v1/devices"
 				for i, id := range p.HostIDs {
@@ -161,7 +165,9 @@ func BuildCloudTools(c *client.Client) []*core.BaseTool {
 			ToolCategory: permissions.CatSystem, ToolAction: permissions.ActionRead,
 			Schema: core.IDSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, http.MethodGet, baseURL+"/v1/sd-wan-configs/"+p.ID, nil)
 			},
@@ -171,7 +177,9 @@ func BuildCloudTools(c *client.Client) []*core.BaseTool {
 			ToolCategory: permissions.CatSystem, ToolAction: permissions.ActionRead,
 			Schema: core.IDSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, http.MethodGet, baseURL+"/v1/sd-wan-configs/"+p.ID+"/status", nil)
 			},

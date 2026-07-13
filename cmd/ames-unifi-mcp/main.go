@@ -10,14 +10,14 @@ import (
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/buildinfo"
-	"github.com/oliveames/ames-unifi-mcp/internal/client"
-	"github.com/oliveames/ames-unifi-mcp/internal/config"
-	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
-	"github.com/oliveames/ames-unifi-mcp/internal/tools"
-	"github.com/oliveames/ames-unifi-mcp/internal/tools/core"
-	"github.com/oliveames/ames-unifi-mcp/internal/tools/extended"
-	"github.com/oliveames/ames-unifi-mcp/internal/version"
+	"github.com/oliverames/ames-unifi-mcp/internal/buildinfo"
+	"github.com/oliverames/ames-unifi-mcp/internal/client"
+	"github.com/oliverames/ames-unifi-mcp/internal/config"
+	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
+	"github.com/oliverames/ames-unifi-mcp/internal/tools"
+	"github.com/oliverames/ames-unifi-mcp/internal/tools/core"
+	"github.com/oliverames/ames-unifi-mcp/internal/tools/extended"
+	"github.com/oliverames/ames-unifi-mcp/internal/version"
 )
 
 func main() {
@@ -51,32 +51,7 @@ func main() {
 	permChecker := permissions.NewChecker(cfg.PermissionProfile)
 	registry := tools.NewRegistry(permChecker, ver)
 
-	// Register all core tools
-	allTools := make([]*core.BaseTool, 0, 200)
-	allTools = append(allTools, core.BuildDeviceTools(c)...)
-	allTools = append(allTools, core.BuildClientTools(c)...)
-	allTools = append(allTools, core.BuildNetworkTools(c)...)
-	allTools = append(allTools, core.BuildWLANTools(c)...)
-	allTools = append(allTools, core.BuildWiFiTools(c)...)
-	allTools = append(allTools, core.BuildFirewallLegacyTools(c)...)
-	allTools = append(allTools, core.BuildFirewallZBFTools(c)...)
-	allTools = append(allTools, core.BuildACLTools(c)...)
-	allTools = append(allTools, core.BuildDNSTools(c)...)
-	allTools = append(allTools, core.BuildTrafficTools(c)...)
-	allTools = append(allTools, core.BuildWANTools(c)...)
-	allTools = append(allTools, core.BuildSwitchingTools(c)...)
-	allTools = append(allTools, core.BuildStatsTools(c)...)
-	allTools = append(allTools, core.BuildEventTools(c)...)
-	allTools = append(allTools, core.BuildSystemTools(c)...)
-
-	// Register extended tools
-	allTools = append(allTools, extended.BuildPoETools(c)...)
-	allTools = append(allTools, extended.BuildHotspotTools(c)...)
-	allTools = append(allTools, extended.BuildCloudTools(c)...)
-	allTools = append(allTools, extended.BuildAdminTools(c)...)
-	allTools = append(allTools, extended.BuildSyslogTools(c)...)
-	allTools = append(allTools, extended.BuildAPGroupTools(c)...)
-	allTools = append(allTools, extended.BuildMiscTools(c)...)
+	allTools := buildAllTools(c)
 
 	for _, t := range allTools {
 		if err := registry.Register(t); err != nil {
@@ -102,6 +77,35 @@ func main() {
 		fmt.Fprintf(os.Stderr, "server error: %v\n", err)
 		os.Exit(1)
 	}
+}
+
+func buildAllTools(c *client.Client) []*core.BaseTool {
+	allTools := make([]*core.BaseTool, 0, 200)
+	allTools = append(allTools, core.BuildDeviceTools(c)...)
+	allTools = append(allTools, core.BuildClientTools(c)...)
+	allTools = append(allTools, core.BuildNetworkTools(c)...)
+	allTools = append(allTools, core.BuildWLANTools(c)...)
+	allTools = append(allTools, core.BuildWiFiTools(c)...)
+	allTools = append(allTools, core.BuildFirewallLegacyTools(c)...)
+	allTools = append(allTools, core.BuildFirewallZBFTools(c)...)
+	allTools = append(allTools, core.BuildACLTools(c)...)
+	allTools = append(allTools, core.BuildDNSTools(c)...)
+	allTools = append(allTools, core.BuildTrafficTools(c)...)
+	allTools = append(allTools, core.BuildWANTools(c)...)
+	allTools = append(allTools, core.BuildSwitchingTools(c)...)
+	allTools = append(allTools, core.BuildStatsTools(c)...)
+	allTools = append(allTools, core.BuildEventTools(c)...)
+	allTools = append(allTools, core.BuildSystemTools(c)...)
+
+	// Register extended tools
+	allTools = append(allTools, extended.BuildPoETools(c)...)
+	allTools = append(allTools, extended.BuildHotspotTools(c)...)
+	allTools = append(allTools, extended.BuildCloudTools(c)...)
+	allTools = append(allTools, extended.BuildAdminTools(c)...)
+	allTools = append(allTools, extended.BuildSyslogTools(c)...)
+	allTools = append(allTools, extended.BuildAPGroupTools(c)...)
+	allTools = append(allTools, extended.BuildMiscTools(c)...)
+	return allTools
 }
 
 // authGate returns a tool result containing the authentication-required

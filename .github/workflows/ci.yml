@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Set up Go
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Verify modules
+        run: |
+          go mod download
+          go mod verify
+
+      - name: Check formatting
+        run: test -z "$(gofmt -l .)"
+
+      - name: Run tests with race detector
+        run: go test -race -coverprofile=coverage.out ./...
+
+      - name: Run go vet
+        run: go vet ./...
+
+      - name: Run staticcheck
+        run: go run honnef.co/go/tools/cmd/staticcheck@2026.1 ./...
+
+      - name: Scan dependencies for known vulnerabilities
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.6.0 ./...
+
+      - name: Validate Node launch and packaging scripts
+        run: node --check install.js scripts/build-mcpb.mjs mcpb/server/launch.js
+
+      - name: Build release targets
+        run: make build-all

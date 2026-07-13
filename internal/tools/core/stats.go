@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/client"
-	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
+	"github.com/oliverames/ames-unifi-mcp/internal/client"
+	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
 )
 
 func BuildStatsTools(c *client.Client) []*BaseTool {
@@ -36,7 +36,9 @@ func BuildStatsTools(c *client.Client) []*BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"scale":{"type":"string","description":"Time scale (e.g. 5minutes)","default":"5minutes"}}}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Scale string `json:"scale"` }
+				var p struct {
+					Scale string `json:"scale"`
+				}
 				json.Unmarshal(input, &p)
 				path := sp() + "/stat/dashboard"
 				if p.Scale != "" {
@@ -51,7 +53,9 @@ func BuildStatsTools(c *client.Client) []*BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"type":{"type":"string","enum":["by_app","by_cat"],"default":"by_app"}}}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Type string `json:"type"` }
+				var p struct {
+					Type string `json:"type"`
+				}
 				json.Unmarshal(input, &p)
 				if p.Type == "" {
 					p.Type = "by_app"
@@ -244,7 +248,9 @@ func BuildStatsTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatStats, ToolAction: permissions.ActionRead,
 			Schema: macSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Mac string `json:"mac"` }
+				var p struct {
+					Mac string `json:"mac"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "GET", sp()+"/stat/spectrumscan/"+p.Mac, nil)
 			},

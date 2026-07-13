@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/client"
-	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
-	"github.com/oliveames/ames-unifi-mcp/internal/tools/core"
+	"github.com/oliverames/ames-unifi-mcp/internal/client"
+	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
+	"github.com/oliverames/ames-unifi-mcp/internal/tools/core"
 )
 
 func BuildMiscTools(c *client.Client) []*core.BaseTool {
@@ -127,7 +127,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"DPI group configuration"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/rest/dpigroup", p.Config)
 			},
@@ -151,7 +153,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 			ToolCategory: permissions.CatDPI, ToolAction: permissions.ActionDelete, Mutating: true,
 			Schema: core.IDSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "DELETE", sp()+"/rest/dpigroup/"+p.ID, nil)
 			},
@@ -211,7 +215,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"within":{"type":"integer","description":"Hours of history","default":8760}}}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Within int `json:"within"` }
+				var p struct {
+					Within int `json:"within"`
+				}
 				json.Unmarshal(input, &p)
 				if p.Within == 0 {
 					p.Within = 8760
@@ -294,7 +300,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"Rogue AP acknowledgement (mac, name, etc.)"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/rest/rogueknown", p.Config)
 			},
@@ -304,7 +312,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 			ToolCategory: permissions.CatDevices, ToolAction: permissions.ActionDelete, Mutating: true,
 			Schema: core.IDSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "DELETE", sp()+"/rest/rogueknown/"+p.ID, nil)
 			},
@@ -351,7 +361,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"filename":{"type":"string","description":"Backup filename to restore"}},"required":["filename"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Filename string `json:"filename"` }
+				var p struct {
+					Filename string `json:"filename"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/cmd/backup", map[string]interface{}{
 					"cmd": "restore-site", "filename": p.Filename,
@@ -365,7 +377,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"Hotspot operator config (name, x_password, note)"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/rest/hotspotop", p.Config)
 			},
@@ -389,7 +403,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 			ToolCategory: permissions.CatHotspot, ToolAction: permissions.ActionDelete, Mutating: true,
 			Schema: core.IDSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "DELETE", sp()+"/rest/hotspotop/"+p.ID, nil)
 			},
@@ -401,7 +417,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"Hotspot 2.0 configuration"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/rest/hotspot2conf", p.Config)
 			},
@@ -425,7 +443,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 			ToolCategory: permissions.CatHotspot, ToolAction: permissions.ActionDelete, Mutating: true,
 			Schema: core.IDSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "DELETE", sp()+"/rest/hotspot2conf/"+p.ID, nil)
 			},
@@ -437,7 +457,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"Billing package config (name, amount, currency, duration)"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/rest/hotspotpackage", p.Config)
 			},
@@ -461,7 +483,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 			ToolCategory: permissions.CatHotspot, ToolAction: permissions.ActionDelete, Mutating: true,
 			Schema: core.IDSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "DELETE", sp()+"/rest/hotspotpackage/"+p.ID, nil)
 			},
@@ -473,7 +497,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"Scheduled task configuration"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/rest/scheduletask", p.Config)
 			},
@@ -497,7 +523,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 			ToolCategory: permissions.CatSettings, ToolAction: permissions.ActionDelete, Mutating: true,
 			Schema: core.IDSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "DELETE", sp()+"/rest/scheduletask/"+p.ID, nil)
 			},

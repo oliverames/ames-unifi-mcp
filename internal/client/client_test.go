@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/config"
+	"github.com/oliverames/ames-unifi-mcp/internal/config"
 )
 
 func TestDoRawRejectsUnexpectedHost(t *testing.T) {

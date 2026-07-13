@@ -125,12 +125,10 @@
 2. Test against a real Dream Machine — still untested against live hardware
 3. Add integration tests or mock-based unit tests for tool handlers and client retry logic
 4. Consider whether Cloud API needs separate auth config (local vs cloud API keys)
-5. Fix the go.mod module path if needed (oliveames vs oliverames)
 
 **Open questions**:
 - Does the same API key work for both local controller and api.ui.com cloud endpoints?
 - Should we add WebSocket support for real-time event streaming (would require a different MCP pattern — resources or notifications)?
-- The go.mod module path uses `github.com/oliveames/ames-unifi-mcp` — needs verification against actual repo
 
 ---
 
@@ -155,6 +153,5 @@
 **Open questions**:
 - Does the same API key work for both local controller and api.ui.com cloud endpoints?
 - Should we use go-unifi library instead of raw HTTP for the legacy endpoints (more type safety, but adds dependency complexity)?
-- The go.mod module path uses `github.com/oliveames/ames-unifi-mcp` but the actual repo is `github.com/oliverames/ames-unifi-mcp` — need to verify and potentially fix the module path
 
 ---

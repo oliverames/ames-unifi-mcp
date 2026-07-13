@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/client"
-	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
-	"github.com/oliveames/ames-unifi-mcp/internal/tools/core"
+	"github.com/oliverames/ames-unifi-mcp/internal/client"
+	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
+	"github.com/oliverames/ames-unifi-mcp/internal/tools/core"
 )
 
 func BuildAdminTools(c *client.Client) []*core.BaseTool {
@@ -51,7 +51,9 @@ func BuildAdminTools(c *client.Client) []*core.BaseTool {
 			}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ SiteID string `json:"site_id"` }
+				var p struct {
+					SiteID string `json:"site_id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/cmd/sitemgr", map[string]interface{}{
 					"cmd": "delete-site", "site": p.SiteID,
@@ -70,7 +72,9 @@ func BuildAdminTools(c *client.Client) []*core.BaseTool {
 			}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Desc string `json:"desc"` }
+				var p struct {
+					Desc string `json:"desc"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/cmd/sitemgr", map[string]interface{}{
 					"cmd": "update-site", "desc": p.Desc,
@@ -140,7 +144,9 @@ func BuildAdminTools(c *client.Client) []*core.BaseTool {
 			}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ AdminID string `json:"admin_id"` }
+				var p struct {
+					AdminID string `json:"admin_id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/cmd/sitemgr", map[string]interface{}{
 					"cmd": "revoke-admin", "admin": p.AdminID,
@@ -231,7 +237,9 @@ func BuildAdminTools(c *client.Client) []*core.BaseTool {
 			}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ AdminID string `json:"admin_id"` }
+				var p struct {
+					AdminID string `json:"admin_id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/cmd/sitemgr", map[string]interface{}{
 					"cmd": "revoke-super-admin", "admin": p.AdminID,

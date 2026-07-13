@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/client"
-	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
+	"github.com/oliverames/ames-unifi-mcp/internal/client"
+	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
 )
 
 // BuildDeviceTools returns all device tools.
@@ -35,7 +35,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatDevices, ToolAction: permissions.ActionRead,
 			Schema: macSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Mac string `json:"mac"` }
+				var p struct {
+					Mac string `json:"mac"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "GET", sp()+"/stat/device/"+p.Mac, nil)
 			},
@@ -71,7 +73,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatDevices, ToolAction: permissions.ActionExecute, Mutating: true,
 			Schema: macSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Mac string `json:"mac"` }
+				var p struct {
+					Mac string `json:"mac"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/cmd/devmgr", map[string]interface{}{"cmd": "adopt", "mac": p.Mac})
 			},
@@ -81,7 +85,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatDevices, ToolAction: permissions.ActionExecute, Mutating: true, Undocumented: true,
 			Schema: macSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Mac string `json:"mac"` }
+				var p struct {
+					Mac string `json:"mac"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/cmd/devmgr", map[string]interface{}{"cmd": "set-locate", "mac": p.Mac})
 			},
@@ -91,7 +97,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatDevices, ToolAction: permissions.ActionExecute, Mutating: true, Undocumented: true,
 			Schema: macSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Mac string `json:"mac"` }
+				var p struct {
+					Mac string `json:"mac"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/cmd/devmgr", map[string]interface{}{"cmd": "unset-locate", "mac": p.Mac})
 			},
@@ -101,7 +109,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatDevices, ToolAction: permissions.ActionExecute, Mutating: true,
 			Schema: macSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Mac string `json:"mac"` }
+				var p struct {
+					Mac string `json:"mac"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/cmd/devmgr", map[string]interface{}{"cmd": "upgrade", "mac": p.Mac})
 			},
@@ -111,7 +121,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatDevices, ToolAction: permissions.ActionExecute, Mutating: true,
 			Schema: macSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Mac string `json:"mac"` }
+				var p struct {
+					Mac string `json:"mac"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/cmd/devmgr", map[string]interface{}{"cmd": "force-provision", "mac": p.Mac})
 			},
@@ -138,7 +150,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 			}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ DeviceID string `json:"device_id"` }
+				var p struct {
+					DeviceID string `json:"device_id"`
+				}
 				json.Unmarshal(input, &p)
 				base := c.Config().BaseURL() + "/integration"
 				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/devices/%s", base, c.Site(), p.DeviceID), nil)
@@ -156,7 +170,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 			}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				base := c.Config().BaseURL() + "/integration"
 				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/devices", base, c.Site()), p.Config)
@@ -205,7 +221,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 			}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ DeviceID string `json:"device_id"` }
+				var p struct {
+					DeviceID string `json:"device_id"`
+				}
 				json.Unmarshal(input, &p)
 				base := c.Config().BaseURL() + "/integration"
 				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/devices/%s/statistics/latest", base, c.Site(), p.DeviceID), nil)
@@ -223,7 +241,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 			}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ DeviceID string `json:"device_id"` }
+				var p struct {
+					DeviceID string `json:"device_id"`
+				}
 				json.Unmarshal(input, &p)
 				base := c.Config().BaseURL() + "/integration"
 				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/devices/%s", base, c.Site(), p.DeviceID), nil)
@@ -280,7 +300,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatDevices, ToolAction: permissions.ActionExecute, Mutating: true,
 			Schema: macSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Mac string `json:"mac"` }
+				var p struct {
+					Mac string `json:"mac"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/cmd/devmgr", map[string]interface{}{"cmd": "spectrum-scan", "mac": p.Mac})
 			},
@@ -334,7 +356,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatDevices, ToolAction: permissions.ActionDelete, Mutating: true,
 			Schema: macSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Mac string `json:"mac"` }
+				var p struct {
+					Mac string `json:"mac"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/cmd/sitemgr", map[string]interface{}{"cmd": "delete-device", "mac": p.Mac})
 			},
@@ -433,7 +457,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 			}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Macs []string `json:"macs"` }
+				var p struct {
+					Macs []string `json:"macs"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/cmd/devmgr", map[string]interface{}{
 					"cmd": "cancel-migrate", "macs": p.Macs,

@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/client"
-	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
+	"github.com/oliverames/ames-unifi-mcp/internal/client"
+	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
 )
 
 func BuildEventTools(c *client.Client) []*BaseTool {
@@ -41,7 +41,9 @@ func BuildEventTools(c *client.Client) []*BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"archived":{"type":"boolean","description":"Include archived (default false)","default":false}}}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Archived *bool `json:"archived"` }
+				var p struct {
+					Archived *bool `json:"archived"`
+				}
 				json.Unmarshal(input, &p)
 				path := sp() + "/rest/alarm"
 				if p.Archived == nil || !*p.Archived {
@@ -63,7 +65,9 @@ func BuildEventTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatEvents, ToolAction: permissions.ActionUpdate, Mutating: true,
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/cmd/evtmgr", map[string]interface{}{"cmd": "archive-alarm", "_id": p.ID})
 			},

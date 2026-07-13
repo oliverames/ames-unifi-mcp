@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/client"
-	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
+	"github.com/oliverames/ames-unifi-mcp/internal/client"
+	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
 )
 
 func BuildWANTools(c *client.Client) []*BaseTool {
@@ -35,7 +35,9 @@ func BuildWANTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatVPN, ToolAction: permissions.ActionRead, MinVer: "9.0.0",
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/vpn/servers/%s", base, c.Site(), p.ID), nil)
 			},
@@ -46,7 +48,9 @@ func BuildWANTools(c *client.Client) []*BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"VPN server configuration"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/vpn/servers", base, c.Site()), p.Config)
 			},
@@ -70,7 +74,9 @@ func BuildWANTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatVPN, ToolAction: permissions.ActionDelete, Mutating: true, MinVer: "10.1.0",
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/vpn/servers/%s", base, c.Site(), p.ID), nil)
 			},
@@ -89,7 +95,9 @@ func BuildWANTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatVPN, ToolAction: permissions.ActionRead, MinVer: "9.0.0",
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/vpn/site-to-site-tunnels/%s", base, c.Site(), p.ID), nil)
 			},
@@ -100,7 +108,9 @@ func BuildWANTools(c *client.Client) []*BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"S2S VPN tunnel configuration"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/vpn/site-to-site-tunnels", base, c.Site()), p.Config)
 			},
@@ -124,7 +134,9 @@ func BuildWANTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatVPN, ToolAction: permissions.ActionDelete, Mutating: true, MinVer: "10.1.0",
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/vpn/site-to-site-tunnels/%s", base, c.Site(), p.ID), nil)
 			},

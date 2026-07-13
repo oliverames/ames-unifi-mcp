@@ -17,7 +17,8 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/ames-unifi-mcp"><img src="https://img.shields.io/npm/v/ames-unifi-mcp?style=flat-square&color=f5a542" alt="npm"></a>
-  <a href="https://github.com/oliverames/ames-unifi-mcp/releases/tag/v1.0.6"><img src="https://img.shields.io/github/v/release/oliverames/ames-unifi-mcp?style=flat-square&color=f5a542&label=MCPB" alt="MCPB release"></a>
+  <a href="https://github.com/oliverames/ames-unifi-mcp/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/oliverames/ames-unifi-mcp/ci.yml?branch=main&style=flat-square&label=CI&color=f5a542" alt="CI"></a>
+  <a href="https://github.com/oliverames/ames-unifi-mcp/releases/tag/v1.0.7"><img src="https://img.shields.io/github/v/release/oliverames/ames-unifi-mcp?style=flat-square&color=f5a542&label=MCPB" alt="MCPB release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-f5a542?style=flat-square" alt="License"></a>
   <a href="https://www.buymeacoffee.com/oliverames"><img src="https://img.shields.io/badge/Buy_Me_a_Coffee-support-f5a542?style=flat-square&logo=buy-me-a-coffee&logoColor=white" alt="Buy Me a Coffee"></a>
 </p>
@@ -44,9 +45,9 @@ Every mutating operation passes through a **confirm gate** that returns a dry-ru
 
 ### Install with MCPB
 
-For Claude Desktop and other MCPB-compatible clients, download the local bundle from the [v1.0.6 release](https://github.com/oliverames/ames-unifi-mcp/releases/tag/v1.0.6):
+For Claude Desktop and other MCPB-compatible clients, download the local bundle from the [v1.0.7 release](https://github.com/oliverames/ames-unifi-mcp/releases/tag/v1.0.7):
 
-[Download `ames-unifi-mcp-1.0.6.mcpb`](https://github.com/oliverames/ames-unifi-mcp/releases/download/v1.0.6/ames-unifi-mcp-1.0.6.mcpb)
+[Download `ames-unifi-mcp-1.0.7.mcpb`](https://github.com/oliverames/ames-unifi-mcp/releases/download/v1.0.7/ames-unifi-mcp-1.0.7.mcpb)
 
 The bundle includes the UniFi favicon, production runtime binaries for macOS and Linux, and setup prompts for host, authentication, site, SSL, tool mode, and permission profile.
 
@@ -288,6 +289,10 @@ The server covers all three UniFi API layers:
 | `UNIFI_API_KEY` | * | &mdash; | API key (preferred, requires 9.1.105+) |
 | `UNIFI_USERNAME` | * | &mdash; | Username (if no API key) |
 | `UNIFI_PASSWORD` | * | &mdash; | Password (if no API key) |
+| `UNIFI_HOST_OP_REF` | No | empty | Caller-owned 1Password reference for the controller URL |
+| `UNIFI_API_KEY_OP_REF` | No | empty | Caller-owned 1Password reference for the API key |
+| `UNIFI_USERNAME_OP_REF` | No | empty | Caller-owned 1Password reference for the username |
+| `UNIFI_PASSWORD_OP_REF` | No | empty | Caller-owned 1Password reference for the password |
 | `UNIFI_SITE` | No | `default` | Site name |
 | `UNIFI_VERIFY_SSL` | No | `true` | `false` for self-signed certs |
 | `UNIFI_TOOL_MODE` | No | `lazy` | `lazy` (3 meta-tools) or `eager` (all 310 tools) |
@@ -297,14 +302,14 @@ The server covers all three UniFi API layers:
 
 ### 1Password fallback
 
-If env vars are unset, the server falls back to 1Password CLI (`op read`) using these references:
+The server can resolve credentials through 1Password CLI, but it does not assume a vault or item name. Set the reference variables to paths you own:
 
-- `op://Development/UniFi Controller/host`
-- `op://Development/UniFi Controller/api_key`
-- `op://Development/UniFi Controller/username`
-- `op://Development/UniFi Controller/password`
+```bash
+UNIFI_HOST_OP_REF="op://Your Vault/Your Item/host"
+UNIFI_API_KEY_OP_REF="op://Your Vault/Your Item/api_key"
+```
 
-Create a `UniFi Controller` item in your `Development` vault with those fields and the server will resolve credentials at startup with no env vars required. Resolution happens in `internal/config/config.go:opRead` and requires either an interactive `op` session or `OP_SERVICE_ACCOUNT_TOKEN` in the environment.
+Plaintext environment variables take priority. The server calls `op read` only when a plaintext value is empty and its matching reference variable is set. This keeps the public package neutral and prevents unexpected 1Password lookups.
 
 ### Authentication Methods
 
@@ -312,18 +317,7 @@ Create a `UniFi Controller` item in your `Development` vault with those fields a
 
 **Username/Password** &mdash; Uses session cookies with automatic re-login on expiry. The server includes a single-flight re-login mechanism that prevents thundering-herd issues when batch operations encounter session timeouts simultaneously.
 
-### 1Password Integration
-
-If credentials are not set in the environment, the server automatically attempts to resolve them from [1Password CLI](https://developer.1password.com/docs/cli/):
-
-| Variable | 1Password Reference |
-|----------|-------------------|
-| `UNIFI_HOST` | `op://Development/UniFi Controller/host` |
-| `UNIFI_API_KEY` | `op://Development/UniFi Controller/api_key` |
-| `UNIFI_USERNAME` | `op://Development/UniFi Controller/username` |
-| `UNIFI_PASSWORD` | `op://Development/UniFi Controller/password` |
-
-This means you can skip setting env vars entirely if you have `op` installed and a service account or session active. The fallback adds ~1-2s to startup and is silently skipped if 1Password is unavailable.
+See [integration testing](docs/INTEGRATION_TESTING.md) for a safe controller test sequence and [release guidance](docs/RELEASING.md) for the checks that produce the npm package, MCPB bundle, checksums, and SBOM.
 
 ---
 

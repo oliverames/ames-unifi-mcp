@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
+	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
 )
 
 // ConfirmGate wraps a mutating tool with the confirm=true safety pattern.

@@ -1,4 +1,4 @@
-module github.com/oliveames/ames-unifi-mcp
+module github.com/oliverames/ames-unifi-mcp
 
 go 1.26.1
 

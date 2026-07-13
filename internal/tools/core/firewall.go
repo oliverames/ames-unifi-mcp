@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/client"
-	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
+	"github.com/oliverames/ames-unifi-mcp/internal/client"
+	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
 )
 
 func BuildFirewallLegacyTools(c *client.Client) []*BaseTool {
@@ -34,7 +34,9 @@ func BuildFirewallLegacyTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatFirewall, ToolAction: permissions.ActionRead,
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "GET", sp()+"/rest/firewallrule/"+p.ID, nil)
 			},
@@ -44,7 +46,9 @@ func BuildFirewallLegacyTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatFirewall, ToolAction: permissions.ActionRead,
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "GET", sp()+"/rest/firewallgroup/"+p.ID, nil)
 			},
@@ -55,7 +59,9 @@ func BuildFirewallLegacyTools(c *client.Client) []*BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"Firewall rule config"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/rest/firewallrule", p.Config)
 			},
@@ -79,7 +85,9 @@ func BuildFirewallLegacyTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatFirewall, ToolAction: permissions.ActionDelete, Mutating: true,
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "DELETE", sp()+"/rest/firewallrule/"+p.ID, nil)
 			},
@@ -90,7 +98,9 @@ func BuildFirewallLegacyTools(c *client.Client) []*BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"Firewall group config (name, group_type, group_members)"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/rest/firewallgroup", p.Config)
 			},
@@ -114,7 +124,9 @@ func BuildFirewallLegacyTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatFirewall, ToolAction: permissions.ActionDelete, Mutating: true,
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "DELETE", sp()+"/rest/firewallgroup/"+p.ID, nil)
 			},
@@ -140,7 +152,9 @@ func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"Firewall zone configuration"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/firewall/zones", base, c.Site()), p.Config)
 			},
@@ -150,7 +164,9 @@ func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatFirewall, ToolAction: permissions.ActionRead, MinVer: "9.0.0",
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/firewall/zones/%s", base, c.Site(), p.ID), nil)
 			},
@@ -174,7 +190,9 @@ func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatFirewall, ToolAction: permissions.ActionDelete, Mutating: true, MinVer: "9.0.0",
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/firewall/zones/%s", base, c.Site(), p.ID), nil)
 			},
@@ -192,7 +210,9 @@ func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatFirewall, ToolAction: permissions.ActionRead, MinVer: "9.0.0",
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/firewall/policies/%s", base, c.Site(), p.ID), nil)
 			},
@@ -203,7 +223,9 @@ func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"Firewall policy configuration"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/firewall/policies", base, c.Site()), p.Config)
 			},
@@ -227,7 +249,9 @@ func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatFirewall, ToolAction: permissions.ActionDelete, Mutating: true, MinVer: "9.0.0",
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/firewall/policies/%s", base, c.Site(), p.ID), nil)
 			},
@@ -260,7 +284,9 @@ func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"Policy ordering configuration"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, "PUT", fmt.Sprintf("%s/v1/sites/%s/firewall/policies/ordering", base, c.Site()), p.Config)
 			},

@@ -45,7 +45,7 @@ internal/
 | `UNIFI_TOOL_MODE` | No | `lazy` | `lazy` (3 meta-tools) or `eager` (all 310) |
 | `UNIFI_PERMISSION_PROFILE` | No | `standard` | `read-only`, `standard`, or `admin` |
 
-\* `UNIFI_HOST` plus either `UNIFI_API_KEY` or `UNIFI_USERNAME`+`UNIFI_PASSWORD` are needed to actually call the controller. If absent, `config.Load()` sets `cfg.NeedsAuth = true` instead of hard-failing — server starts, registers tools, and every tool dispatch in `cmd/ames-unifi-mcp/main.go` short-circuits with `cfg.AuthHint()`. Plugin appears installed-but-inactive instead of erroring at startup. Same applies if the 1Password fallback (`op://Development/UniFi Controller/...`) returns nothing.
+\* `UNIFI_HOST` plus either `UNIFI_API_KEY` or `UNIFI_USERNAME`+`UNIFI_PASSWORD` are needed to actually call the controller. If absent, `config.Load()` sets `cfg.NeedsAuth = true` instead of hard-failing. The server starts, registers tools, and every tool dispatch in `cmd/ames-unifi-mcp/main.go` short-circuits with `cfg.AuthHint()`. The plugin appears installed but inactive instead of erroring at startup. The same behavior applies when caller-supplied 1Password references return nothing.
 
 ## Lazy Mode Architecture
 
@@ -101,7 +101,6 @@ Some tools use undocumented endpoints (marked in their descriptions). These work
 ## Gotchas
 
 - **Self-signed certs**: Most UniFi controllers use self-signed TLS. Set `UNIFI_VERIFY_SSL=false` or requests will fail silently.
-- **Makefile module path**: The `MODULE` var in the Makefile references `oliveames` (missing `r`). This doesn't affect builds but matters if Go module tooling uses it.
 - **Session re-login thundering herd**: The client uses single-flight re-login to prevent parallel batch operations from all hitting the login endpoint simultaneously. If you see auth errors during batch calls, this is already handled — don't add extra retry logic.
 - **API key vs session auth scope**: API key auth works with Legacy + Integration API. But some v2 API endpoints only accept session cookies — if a v2 tool fails with an API key, try username/password auth.
 - **tool_batch parallelism**: `tool_batch` executes tools concurrently. Don't batch operations that depend on each other's results (e.g., create network → assign device to that network).

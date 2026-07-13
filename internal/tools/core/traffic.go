@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/client"
-	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
+	"github.com/oliverames/ames-unifi-mcp/internal/client"
+	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
 )
 
 func BuildTrafficTools(c *client.Client) []*BaseTool {
@@ -28,7 +28,9 @@ func BuildTrafficTools(c *client.Client) []*BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"Traffic rule configuration"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", fmt.Sprintf("v2/api/site/%s/trafficrules", c.Site()), p.Config)
 			},
@@ -38,7 +40,9 @@ func BuildTrafficTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatQoS, ToolAction: permissions.ActionRead,
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "GET", fmt.Sprintf("v2/api/site/%s/trafficrules/%s", c.Site(), p.ID), nil)
 			},
@@ -62,7 +66,9 @@ func BuildTrafficTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatQoS, ToolAction: permissions.ActionDelete, Mutating: true,
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "DELETE", fmt.Sprintf("v2/api/site/%s/trafficrules/%s", c.Site(), p.ID), nil)
 			},
@@ -82,7 +88,9 @@ func BuildTrafficTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatRouting, ToolAction: permissions.ActionRead,
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "GET", fmt.Sprintf("v2/api/site/%s/trafficroutes/%s", c.Site(), p.ID), nil)
 			},
@@ -93,7 +101,9 @@ func BuildTrafficTools(c *client.Client) []*BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"Traffic route configuration"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", fmt.Sprintf("v2/api/site/%s/trafficroutes", c.Site()), p.Config)
 			},
@@ -117,7 +127,9 @@ func BuildTrafficTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatRouting, ToolAction: permissions.ActionDelete, Mutating: true,
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "DELETE", fmt.Sprintf("v2/api/site/%s/trafficroutes/%s", c.Site(), p.ID), nil)
 			},
@@ -138,7 +150,9 @@ func BuildTrafficTools(c *client.Client) []*BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"Traffic matching list configuration"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/traffic-matching-lists", base, c.Site()), p.Config)
 			},
@@ -148,7 +162,9 @@ func BuildTrafficTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatQoS, ToolAction: permissions.ActionRead, MinVer: "10.0.0",
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/traffic-matching-lists/%s", base, c.Site(), p.ID), nil)
 			},
@@ -172,7 +188,9 @@ func BuildTrafficTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatQoS, ToolAction: permissions.ActionDelete, Mutating: true, MinVer: "10.0.0",
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/traffic-matching-lists/%s", base, c.Site(), p.ID), nil)
 			},

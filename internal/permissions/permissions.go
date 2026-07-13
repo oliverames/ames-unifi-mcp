@@ -1,6 +1,6 @@
 package permissions
 
-import "github.com/oliveames/ames-unifi-mcp/internal/config"
+import "github.com/oliverames/ames-unifi-mcp/internal/config"
 
 // Action represents what a tool does.
 type Action int

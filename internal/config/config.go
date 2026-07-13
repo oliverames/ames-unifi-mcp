@@ -55,9 +55,9 @@ type Config struct {
 func (c *Config) AuthHint() string {
 	return "UniFi Controller credentials not configured. Either set " +
 		"UNIFI_HOST and UNIFI_API_KEY (or UNIFI_USERNAME+UNIFI_PASSWORD) in " +
-		"the environment, or create a 'UniFi Controller' item in the " +
-		"Development 1Password vault with fields: host, api_key (or " +
-		"username + password)."
+		"the environment, or provide caller-owned 1Password references through " +
+		"UNIFI_HOST_OP_REF and UNIFI_API_KEY_OP_REF (or " +
+		"UNIFI_USERNAME_OP_REF and UNIFI_PASSWORD_OP_REF)."
 }
 
 func (c *Config) AuthMethod() AuthMethod {
@@ -80,10 +80,10 @@ func (c *Config) CloudBaseURL() string {
 
 func Load() (*Config, error) {
 	cfg := &Config{
-		Host:      os.Getenv("UNIFI_HOST"),
-		APIKey:    os.Getenv("UNIFI_API_KEY"),
-		Username:  os.Getenv("UNIFI_USERNAME"),
-		Password:  os.Getenv("UNIFI_PASSWORD"),
+		Host:      envOrOP("UNIFI_HOST", "UNIFI_HOST_OP_REF"),
+		APIKey:    envOrOP("UNIFI_API_KEY", "UNIFI_API_KEY_OP_REF"),
+		Username:  envOrOP("UNIFI_USERNAME", "UNIFI_USERNAME_OP_REF"),
+		Password:  envOrOP("UNIFI_PASSWORD", "UNIFI_PASSWORD_OP_REF"),
 		Site:      envOrDefault("UNIFI_SITE", "default"),
 		VerifySSL: parseBoolDefault(os.Getenv("UNIFI_VERIFY_SSL"), true),
 		LogLevel:  envOrDefault("UNIFI_LOG_LEVEL", "error"),
@@ -105,22 +105,6 @@ func Load() (*Config, error) {
 		cfg.PermissionProfile = PermStandard
 	}
 
-	// 1Password fallback for missing credentials
-	if cfg.Host == "" {
-		cfg.Host = opRead("op://Development/UniFi Controller/host")
-	}
-	if cfg.APIKey == "" {
-		cfg.APIKey = opRead("op://Development/UniFi Controller/api_key")
-	}
-	if cfg.APIKey == "" {
-		if cfg.Username == "" {
-			cfg.Username = opRead("op://Development/UniFi Controller/username")
-		}
-		if cfg.Password == "" {
-			cfg.Password = opRead("op://Development/UniFi Controller/password")
-		}
-	}
-
 	// Soft-fail: if credentials are missing, mark as NeedsAuth and let the
 	// server start anyway. Tool handlers check this flag and return a
 	// structured "configure me" error instead of running.
@@ -138,6 +122,17 @@ func Load() (*Config, error) {
 	}
 
 	return cfg, nil
+}
+
+func envOrOP(valueKey, referenceKey string) string {
+	if value := strings.TrimSpace(os.Getenv(valueKey)); value != "" {
+		return value
+	}
+	reference := strings.TrimSpace(os.Getenv(referenceKey))
+	if reference == "" {
+		return ""
+	}
+	return opRead(reference)
 }
 
 // opRead attempts to read a secret from 1Password CLI.

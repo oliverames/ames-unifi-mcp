@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/client"
-	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
-	"github.com/oliveames/ames-unifi-mcp/internal/tools/core"
+	"github.com/oliverames/ames-unifi-mcp/internal/client"
+	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
+	"github.com/oliverames/ames-unifi-mcp/internal/tools/core"
 )
 
 func BuildAPGroupTools(c *client.Client) []*core.BaseTool {
@@ -29,7 +29,9 @@ func BuildAPGroupTools(c *client.Client) []*core.BaseTool {
 			MinVer: "6.0.0",
 			Schema: core.IDSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "GET", ap()+"/"+p.ID, nil)
 			},
@@ -47,7 +49,9 @@ func BuildAPGroupTools(c *client.Client) []*core.BaseTool {
 			}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", ap(), p.Config)
 			},
@@ -80,7 +84,9 @@ func BuildAPGroupTools(c *client.Client) []*core.BaseTool {
 			MinVer: "6.0.0", Mutating: true,
 			Schema: core.IDSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "DELETE", ap()+"/"+p.ID, nil)
 			},

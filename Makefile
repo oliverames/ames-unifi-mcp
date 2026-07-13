@@ -1,5 +1,5 @@
 BINARY=ames-unifi-mcp
-MODULE=github.com/oliveames/ames-unifi-mcp
+MODULE=github.com/oliverames/ames-unifi-mcp
 VERSION=$(shell node -p "require('./package.json').version" 2>/dev/null || git describe --tags --always --dirty 2>/dev/null || echo "dev")
 LDFLAGS=-s -w -X $(MODULE)/internal/buildinfo.Version=$(VERSION)
 

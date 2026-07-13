@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/client"
-	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
+	"github.com/oliverames/ames-unifi-mcp/internal/client"
+	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
 )
 
 func BuildACLTools(c *client.Client) []*BaseTool {
@@ -27,7 +27,9 @@ func BuildACLTools(c *client.Client) []*BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"ACL rule configuration"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/acl-rules", base, c.Site()), p.Config)
 			},
@@ -37,7 +39,9 @@ func BuildACLTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatFirewall, ToolAction: permissions.ActionRead, MinVer: "10.0.0",
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/acl-rules/%s", base, c.Site(), p.ID), nil)
 			},
@@ -61,7 +65,9 @@ func BuildACLTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatFirewall, ToolAction: permissions.ActionDelete, Mutating: true, MinVer: "10.0.0",
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/acl-rules/%s", base, c.Site(), p.ID), nil)
 			},
@@ -80,7 +86,9 @@ func BuildACLTools(c *client.Client) []*BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"ACL rule ordering configuration"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.DoRaw(ctx, "PUT", fmt.Sprintf("%s/v1/sites/%s/acl-rules/ordering", base, c.Site()), p.Config)
 			},

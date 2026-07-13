@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/client"
-	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
+	"github.com/oliverames/ames-unifi-mcp/internal/client"
+	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
 )
 
 func BuildClientTools(c *client.Client) []*BaseTool {
@@ -32,7 +32,9 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 			}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Within int `json:"within"` }
+				var p struct {
+					Within int `json:"within"`
+				}
 				json.Unmarshal(input, &p)
 				if p.Within == 0 {
 					p.Within = 8760
@@ -47,7 +49,9 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatClients, ToolAction: permissions.ActionRead,
 			Schema: macSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Mac string `json:"mac"` }
+				var p struct {
+					Mac string `json:"mac"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "GET", sp()+"/stat/sta/"+p.Mac, nil)
 			},
@@ -57,7 +61,9 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatClients, ToolAction: permissions.ActionExecute, Mutating: true,
 			Schema: macSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Mac string `json:"mac"` }
+				var p struct {
+					Mac string `json:"mac"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/cmd/stamgr", map[string]interface{}{"cmd": "block-sta", "mac": p.Mac})
 			},
@@ -67,7 +73,9 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatClients, ToolAction: permissions.ActionExecute, Mutating: true,
 			Schema: macSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Mac string `json:"mac"` }
+				var p struct {
+					Mac string `json:"mac"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/cmd/stamgr", map[string]interface{}{"cmd": "unblock-sta", "mac": p.Mac})
 			},
@@ -77,7 +85,9 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatClients, ToolAction: permissions.ActionExecute, Mutating: true,
 			Schema: macSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Mac string `json:"mac"` }
+				var p struct {
+					Mac string `json:"mac"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/cmd/stamgr", map[string]interface{}{"cmd": "kick-sta", "mac": p.Mac})
 			},
@@ -87,7 +97,9 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatClients, ToolAction: permissions.ActionDelete, Mutating: true, MinVer: "5.9.0",
 			Schema: macSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Mac string `json:"mac"` }
+				var p struct {
+					Mac string `json:"mac"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/cmd/stamgr", map[string]interface{}{"cmd": "forget-sta", "macs": []string{p.Mac}})
 			},
@@ -105,7 +117,9 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatClients, ToolAction: permissions.ActionRead,
 			Schema: macSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Mac string `json:"mac"` }
+				var p struct {
+					Mac string `json:"mac"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "GET", sp()+"/stat/user/"+p.Mac, nil)
 			},
@@ -174,7 +188,9 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 			}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ClientID string `json:"client_id"` }
+				var p struct {
+					ClientID string `json:"client_id"`
+				}
 				json.Unmarshal(input, &p)
 				base := c.Config().BaseURL() + "/integration"
 				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/clients/%s", base, c.Site(), p.ClientID), nil)

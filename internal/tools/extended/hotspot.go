@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/client"
-	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
-	"github.com/oliveames/ames-unifi-mcp/internal/tools/core"
+	"github.com/oliverames/ames-unifi-mcp/internal/client"
+	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
+	"github.com/oliverames/ames-unifi-mcp/internal/tools/core"
 )
 
 func BuildHotspotTools(c *client.Client) []*core.BaseTool {
@@ -61,7 +61,9 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 			ToolCategory: permissions.CatHotspot, ToolAction: permissions.ActionExecute, Mutating: true,
 			Schema: core.MacSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Mac string `json:"mac"` }
+				var p struct {
+					Mac string `json:"mac"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/cmd/stamgr", map[string]interface{}{"cmd": "unauthorize-guest", "mac": p.Mac})
 			},
@@ -72,7 +74,9 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"within":{"type":"integer","description":"Hours of history (default 24)","default":24}}}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Within int `json:"within"` }
+				var p struct {
+					Within int `json:"within"`
+				}
 				json.Unmarshal(input, &p)
 				if p.Within == 0 {
 					p.Within = 24
@@ -99,9 +103,9 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
 				var p struct {
-					Count         int  `json:"count"`
-					ExpireMinutes int  `json:"expire_minutes"`
-					Quota         *int `json:"quota"`
+					Count         int    `json:"count"`
+					ExpireMinutes int    `json:"expire_minutes"`
+					Quota         *int   `json:"quota"`
 					Note          string `json:"note,omitempty"`
 					Up            int    `json:"up,omitempty"`
 					Down          int    `json:"down,omitempty"`
@@ -138,7 +142,9 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 			ToolCategory: permissions.CatHotspot, ToolAction: permissions.ActionDelete, Mutating: true,
 			Schema: core.IDSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/cmd/hotspot", map[string]interface{}{
 					"cmd": "delete-voucher", "_id": p.ID,
@@ -150,7 +156,9 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 			ToolCategory: permissions.CatHotspot, ToolAction: permissions.ActionUpdate, Mutating: true,
 			Schema: core.IDSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/cmd/hotspot", map[string]interface{}{
 					"cmd": "extend", "_id": p.ID,
@@ -172,7 +180,9 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 			ToolCategory: permissions.CatHotspot, ToolAction: permissions.ActionRead, MinVer: "9.0.0",
 			Schema: core.IDSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				base := c.Config().BaseURL() + "/integration"
 				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/hotspot/vouchers/%s", base, c.Site(), p.ID), nil)
@@ -184,7 +194,9 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"Voucher generation config"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				base := c.Config().BaseURL() + "/integration"
 				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/hotspot/vouchers", base, c.Site()), p.Config)
@@ -195,7 +207,9 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 			ToolCategory: permissions.CatHotspot, ToolAction: permissions.ActionDelete, Mutating: true, MinVer: "9.0.0",
 			Schema: core.IDSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				base := c.Config().BaseURL() + "/integration"
 				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/hotspot/vouchers/%s", base, c.Site(), p.ID), nil)

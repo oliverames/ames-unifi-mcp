@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/oliveames/ames-unifi-mcp/internal/client"
-	"github.com/oliveames/ames-unifi-mcp/internal/permissions"
+	"github.com/oliverames/ames-unifi-mcp/internal/client"
+	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
 )
 
 func BuildSystemTools(c *client.Client) []*BaseTool {
@@ -220,7 +220,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatNetworks, ToolAction: permissions.ActionDelete, Mutating: true,
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "DELETE", sp()+"/rest/portforward/"+p.ID, nil)
 			},
@@ -257,7 +259,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatRouting, ToolAction: permissions.ActionDelete, Mutating: true,
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "DELETE", sp()+"/rest/routing/"+p.ID, nil)
 			},
@@ -302,7 +306,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatSettings, ToolAction: permissions.ActionDelete, Mutating: true,
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "DELETE", sp()+"/rest/usergroup/"+p.ID, nil)
 			},
@@ -313,7 +319,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"key":{"type":"string","description":"Setting key name (e.g. mgmt, ips, guest_access, dpi, country, connectivity, snmp, ntp, rsyslogd, radius, super_smtp)"}},"required":["key"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Key string `json:"key"` }
+				var p struct {
+					Key string `json:"key"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "GET", sp()+"/get/setting/"+p.Key, nil)
 			},
@@ -332,7 +340,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"Port profile configuration"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/rest/portconf", p.Config)
 			},
@@ -356,7 +366,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatDevices, ToolAction: permissions.ActionDelete, Mutating: true,
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "DELETE", sp()+"/rest/portconf/"+p.ID, nil)
 			},
@@ -401,7 +413,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatNetworks, ToolAction: permissions.ActionDelete, Mutating: true,
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "DELETE", sp()+"/rest/dhcpoption/"+p.ID, nil)
 			},
@@ -428,7 +442,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"RADIUS profile configuration"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/rest/radiusprofile", p.Config)
 			},
@@ -452,7 +468,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatNetworks, ToolAction: permissions.ActionDelete, Mutating: true, MinVer: "5.5.19",
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "DELETE", sp()+"/rest/radiusprofile/"+p.ID, nil)
 			},
@@ -463,7 +481,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 			Schema: json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"RADIUS account configuration"}},"required":["config"]}`),
 			Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ Config json.RawMessage `json:"config"` }
+				var p struct {
+					Config json.RawMessage `json:"config"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "POST", sp()+"/rest/account", p.Config)
 			},
@@ -487,7 +507,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatNetworks, ToolAction: permissions.ActionDelete, Mutating: true, MinVer: "5.5.19",
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "DELETE", sp()+"/rest/account/"+p.ID, nil)
 			},
@@ -532,7 +554,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatDevices, ToolAction: permissions.ActionDelete, Mutating: true, MinVer: "5.5.0",
 			Schema: idSchema(), Client: c,
 			Handler: func(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
-				var p struct{ ID string `json:"id"` }
+				var p struct {
+					ID string `json:"id"`
+				}
 				json.Unmarshal(input, &p)
 				return c.Do(ctx, "DELETE", sp()+"/rest/tag/"+p.ID, nil)
 			},

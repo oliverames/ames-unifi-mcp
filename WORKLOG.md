@@ -1,5 +1,19 @@
 # Worklog
 
+## 2026-07-22 - Merge routine action maintenance
+
+**What changed**: Merged the three open GitHub Actions maintenance pull requests through PRs #6, #7, and #8. The repository now uses the approved checkout, setup-node, and CodeQL revisions from that batch.
+
+**Decisions made**: Kept this pass limited to routine action maintenance; no product behavior or release artifacts changed.
+
+**Left off at**: `main` is clean, synchronized, and has no open pull requests from this maintenance batch.
+
+**Open questions**: The prior npm authentication and live UniFi credential items remain as recorded below; this CI-only pass did not change them.
+
+**Verification**: Formatting, Go tests with race and coverage, vet, Node syntax checks, and the post-merge GitHub Actions run passed.
+
+---
+
 ## 2026-06-02 — v1.0.6 hardening and reproducible MCPB release
 
 **What changed**: Hardened request handling and packaging before the MCPB release. `UNIFI_HOST` is now validated as an http/https origin with no embedded credentials, query, fragment, or application path. `UNIFI_SITE` is restricted to site identifiers using letters, numbers, underscores, and hyphens. `UNIFI_VERIFY_SSL` parsing now defaults safely instead of treating typos as false. HTTP requests are restricted to the configured UniFi controller host or `api.ui.com`, and response bodies are capped at 10 MiB. Mutating-tool dry-run previews now redact sensitive fields before echoing parameters. `tool_batch` now rejects batches larger than 25 calls. Release binaries now advertise the package version through `internal/buildinfo`.

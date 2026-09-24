@@ -1,5 +1,15 @@
 # Worklog
 
+## 2026-09-24 — confirmation precision and patched toolchain (#19, #20)
+
+The confirmation gate now preserves JSON numeric tokens while removing confirm and redacting previews. Regression tests fail on the old gate for nested integers beyond 2^53 and high-precision decimals, and pass with exact values preserved for omitted, false, and true confirmation. Invalid requests and dry-run secret redaction remain covered.
+
+Raised the minimum/CI Go version and Docker builder to 1.26.8, the patched supported 1.26 release. CI and release workflows already read go.mod. CONTRIBUTING selects GOTOOLCHAIN explicitly so newer local Go installations do not trigger the pinned analyzer export-format mismatch. Dependency versions and go.sum are unchanged.
+
+Combined verification with Go 1.26.8 passed: race tests, vet, staticcheck 2026.1, govulncheck 1.6.0, and all four platform builds. The scan found zero affected or imported-package vulnerabilities and one uncalled module-level advisory. Docker image construction was not tested.
+
+Compatibility review also permits safe colon/dot punctuation in opaque IDs while rejecting exact dot segments and path/query/fragment/escape syntax. No controller calls, installed binary updates, npm publication, or deployment are part of these source fixes.
+
 ## 2026-09-24 — request retry and input validation (#14, #15)
 
 Requests now retry ambiguous network/429/5xx failures only for GET/HEAD. Mutations return the first outcome instead of risking duplicate writes. Backoff honors cancellation. Re-login retries revalidate the destination and preserve response-body errors. Fake transports reproduce the previous duplicate POST and swallowed errors, then pass with the fix. A definite unauthorized response retains the existing one-time session refresh behavior.

@@ -14,7 +14,7 @@ import (
 var compiled sync.Map
 var macAddress = regexp.MustCompile(`^[0-9a-f]{2}(:[0-9a-f]{2}){5}$`)
 
-var safeIdentifier = regexp.MustCompile(`^[A-Za-z0-9_-]+$`)
+var safeIdentifier = regexp.MustCompile(`^[A-Za-z0-9_.:-]+$`)
 
 // Validate checks the declared schema and controller identifiers. It deliberately
 // accepts opaque legacy IDs as well as ObjectIds and UUIDs, but never path syntax.
@@ -81,7 +81,7 @@ func Validate(schema, input json.RawMessage) error {
 				return fmt.Errorf("%s must be a lowercase, colon-separated six-byte MAC address", key)
 			}
 		case key == "id" || strings.HasSuffix(key, "_id"):
-			if !safeIdentifier.MatchString(s) {
+			if s == "." || s == ".." || !safeIdentifier.MatchString(s) {
 				return fmt.Errorf("%s must be a nonempty identifier without path separators", key)
 			}
 		}

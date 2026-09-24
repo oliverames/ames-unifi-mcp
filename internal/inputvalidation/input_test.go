@@ -4,12 +4,12 @@ import "testing"
 
 func TestIdentifierCompatibility(t *testing.T) {
 	schema := []byte(`{"type":"object","properties":{"device_id":{"type":"string"}},"required":["device_id"]}`)
-	for _, id := range []string{"507f1f77bcf86cd799439011", "f47ac10b-58cc-4372-a567-0e02b2c3d479", "legacy_123", "123", "default"} {
+	for _, id := range []string{"507f1f77bcf86cd799439011", "f47ac10b-58cc-4372-a567-0e02b2c3d479", "legacy_123", "123", "default", "opaque:123", "resource.v2"} {
 		if err := Validate(schema, []byte(`{"device_id":"`+id+`"}`)); err != nil {
 			t.Errorf("%s: %v", id, err)
 		}
 	}
-	for _, id := range []string{"", " ", "../foo", "foo/bar", "foo%2fbar", "foo?bar", "foo#bar", "a\\\\b"} {
+	for _, id := range []string{"", " ", ".", "..", "../foo", "foo/bar", "foo%2fbar", "foo?bar", "foo#bar", "a\\\\b"} {
 		if err := Validate(schema, []byte(`{"device_id":"`+id+`"}`)); err == nil {
 			t.Errorf("accepted %q", id)
 		}

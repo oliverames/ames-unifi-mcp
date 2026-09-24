@@ -4,16 +4,19 @@ Thanks for helping improve the UniFi MCP server.
 
 ## Before you start
 
-- Use Go 1.26.5 or newer and Node.js 22 or newer.
+- Use Go 1.26.8 for project checks and Node.js 22 or newer.
 - Open an issue before making a large API or architecture change.
 - Read `docs/api-research.md` before adding a tool. Update that file when an endpoint, version requirement, or controller behavior changes.
 - Keep mutating tools behind the existing confirmation gate.
 
 ## Local checks
 
-Run the same checks used in CI:
+Run the same checks used in CI. Select the project toolchain explicitly when your
+local Go installation is newer. The pinned staticcheck release does not support
+Go 1.27 export data:
 
 ```bash
+export GOTOOLCHAIN=go1.26.8
 test -z "$(gofmt -l .)"
 go test -race ./...
 go vet ./...

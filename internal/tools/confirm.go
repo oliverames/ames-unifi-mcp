@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -62,7 +63,10 @@ func (g *ConfirmGate) Execute(ctx context.Context, input json.RawMessage) (json.
 		return nil, err
 	}
 	var params map[string]interface{}
-	if err := json.Unmarshal(input, &params); err != nil {
+	// Preserve exact JSON numbers while removing confirm or redacting previews.
+	decoder := json.NewDecoder(bytes.NewReader(input))
+	decoder.UseNumber()
+	if err := decoder.Decode(&params); err != nil {
 		return nil, fmt.Errorf("parsing input: %w", err)
 	}
 

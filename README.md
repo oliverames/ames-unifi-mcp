@@ -331,7 +331,8 @@ internal/
     - Session auth with auto re-login (single-flight)
     - API key auth (X-API-Key header)
     - CSRF token management (thread-safe)
-    - Retry with backoff (429, 5xx)
+    - Cancellable retry backoff for GET/HEAD (network errors, 429, 5xx)
+    - Mutations are not replayed after ambiguous failures
     - Legacy envelope parsing (meta.rc/data)
     - Raw response passthrough (Integration/v2 APIs)
   version/                           Controller version detection

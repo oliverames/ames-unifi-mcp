@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/oliverames/ames-unifi-mcp/internal/inputvalidation"
 	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
 )
 
@@ -42,11 +43,19 @@ func (m *MetaToolIndex) InputSchema() json.RawMessage {
 }
 
 func (m *MetaToolIndex) Execute(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
+	if len(input) == 0 {
+		input = json.RawMessage(`{}`)
+	}
+	if err := inputvalidation.Validate(m.InputSchema(), input); err != nil {
+		return nil, err
+	}
 	var params struct {
 		Category string `json:"category"`
 	}
 	if len(input) > 0 {
-		json.Unmarshal(input, &params)
+		if err := json.Unmarshal(input, &params); err != nil {
+			return nil, fmt.Errorf("parsing input: %w", err)
+		}
 	}
 	index := m.registry.Index(params.Category)
 	return json.Marshal(index)
@@ -89,6 +98,12 @@ func (m *MetaToolExecute) InputSchema() json.RawMessage {
 }
 
 func (m *MetaToolExecute) Execute(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
+	if len(input) == 0 {
+		input = json.RawMessage(`{}`)
+	}
+	if err := inputvalidation.Validate(m.InputSchema(), input); err != nil {
+		return nil, err
+	}
 	var params struct {
 		ToolName string          `json:"tool_name"`
 		Input    json.RawMessage `json:"input"`
@@ -143,6 +158,12 @@ func (m *MetaToolBatch) InputSchema() json.RawMessage {
 }
 
 func (m *MetaToolBatch) Execute(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
+	if len(input) == 0 {
+		input = json.RawMessage(`{}`)
+	}
+	if err := inputvalidation.Validate(m.InputSchema(), input); err != nil {
+		return nil, err
+	}
 	var params struct {
 		Calls []BatchCall `json:"calls"`
 	}

@@ -38,7 +38,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Mac string `json:"mac"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "GET", sp()+"/stat/device/"+p.Mac, nil)
 			},
 		},
@@ -59,7 +61,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 					Mac        string `json:"mac"`
 					RebootType string `json:"reboot_type"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				if p.RebootType == "" {
 					p.RebootType = "soft"
 				}
@@ -76,7 +80,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Mac string `json:"mac"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/devmgr", map[string]interface{}{"cmd": "adopt", "mac": p.Mac})
 			},
 		},
@@ -88,7 +94,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Mac string `json:"mac"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/devmgr", map[string]interface{}{"cmd": "set-locate", "mac": p.Mac})
 			},
 		},
@@ -100,7 +108,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Mac string `json:"mac"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/devmgr", map[string]interface{}{"cmd": "unset-locate", "mac": p.Mac})
 			},
 		},
@@ -112,7 +122,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Mac string `json:"mac"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/devmgr", map[string]interface{}{"cmd": "upgrade", "mac": p.Mac})
 			},
 		},
@@ -124,7 +136,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Mac string `json:"mac"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/devmgr", map[string]interface{}{"cmd": "force-provision", "mac": p.Mac})
 			},
 		},
@@ -153,7 +167,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 				var p struct {
 					DeviceID string `json:"device_id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				base := c.Config().BaseURL() + "/integration"
 				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/devices/%s", base, c.Site(), p.DeviceID), nil)
 			},
@@ -173,7 +189,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				base := c.Config().BaseURL() + "/integration"
 				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/devices", base, c.Site()), p.Config)
 			},
@@ -195,7 +213,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 					DeviceID string          `json:"device_id"`
 					Config   json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				base := c.Config().BaseURL() + "/integration"
 				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/devices/%s/actions", base, c.Site(), p.DeviceID), p.Config)
 			},
@@ -224,7 +244,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 				var p struct {
 					DeviceID string `json:"device_id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				base := c.Config().BaseURL() + "/integration"
 				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/devices/%s/statistics/latest", base, c.Site(), p.DeviceID), nil)
 			},
@@ -244,7 +266,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 				var p struct {
 					DeviceID string `json:"device_id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				base := c.Config().BaseURL() + "/integration"
 				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/devices/%s", base, c.Site(), p.DeviceID), nil)
 			},
@@ -268,7 +292,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 					PortIdx  int             `json:"port_idx"`
 					Config   json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				base := c.Config().BaseURL() + "/integration"
 				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/devices/%s/interfaces/ports/%d/actions", base, c.Site(), p.DeviceID, p.PortIdx), p.Config)
 			},
@@ -291,7 +317,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", sp()+"/rest/device/"+p.ID, p.Config)
 			},
 		},
@@ -303,7 +331,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Mac string `json:"mac"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/devmgr", map[string]interface{}{"cmd": "spectrum-scan", "mac": p.Mac})
 			},
 		},
@@ -334,7 +364,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 				var p struct {
 					DeviceTypes []string `json:"device_types"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				if len(p.DeviceTypes) == 0 {
 					p.DeviceTypes = []string{"uap", "usw", "ugw", "uxg"}
 				}
@@ -359,7 +391,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Mac string `json:"mac"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/sitemgr", map[string]interface{}{"cmd": "delete-device", "mac": p.Mac})
 			},
 		},
@@ -388,7 +422,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 					URL      string `json:"url"`
 					Port     int    `json:"port"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				payload := map[string]interface{}{
 					"cmd": "adv-adopt", "mac": p.Mac, "ip": p.IP,
 					"username": p.Username, "password": p.Password, "url": p.URL,
@@ -416,7 +452,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 					Mac string `json:"mac"`
 					URL string `json:"url"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/devmgr", map[string]interface{}{
 					"cmd": "upgrade-external", "mac": p.Mac, "url": p.URL,
 				})
@@ -439,7 +477,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 					Macs      []string `json:"macs"`
 					InformURL string   `json:"inform_url"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/devmgr", map[string]interface{}{
 					"cmd": "migrate", "macs": p.Macs, "inform_url": p.InformURL,
 				})
@@ -460,7 +500,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Macs []string `json:"macs"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/devmgr", map[string]interface{}{
 					"cmd": "cancel-migrate", "macs": p.Macs,
 				})
@@ -491,7 +533,9 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 					ID   string `json:"id"`
 					Name string `json:"name"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/upd/device/"+p.ID, map[string]interface{}{"name": p.Name})
 			},
 		},

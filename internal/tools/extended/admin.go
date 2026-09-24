@@ -31,7 +31,9 @@ func BuildAdminTools(c *client.Client) []*core.BaseTool {
 					Desc string `json:"desc"`
 					Name string `json:"name"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				payload := map[string]interface{}{"cmd": "add-site", "desc": p.Desc}
 				if p.Name != "" {
 					payload["name"] = p.Name
@@ -54,7 +56,9 @@ func BuildAdminTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					SiteID string `json:"site_id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/sitemgr", map[string]interface{}{
 					"cmd": "delete-site", "site": p.SiteID,
 				})
@@ -75,7 +79,9 @@ func BuildAdminTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					Desc string `json:"desc"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/sitemgr", map[string]interface{}{
 					"cmd": "update-site", "desc": p.Desc,
 				})
@@ -98,7 +104,9 @@ func BuildAdminTools(c *client.Client) []*core.BaseTool {
 					Mac    string `json:"mac"`
 					SiteID string `json:"site_id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/sitemgr", map[string]interface{}{
 					"cmd": "move-device", "mac": p.Mac, "site": p.SiteID,
 				})
@@ -123,7 +131,9 @@ func BuildAdminTools(c *client.Client) []*core.BaseTool {
 					Email string `json:"email"`
 					Role  string `json:"role"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				if p.Role == "" {
 					p.Role = "admin"
 				}
@@ -147,7 +157,9 @@ func BuildAdminTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					AdminID string `json:"admin_id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/sitemgr", map[string]interface{}{
 					"cmd": "revoke-admin", "admin": p.AdminID,
 				})
@@ -172,7 +184,9 @@ func BuildAdminTools(c *client.Client) []*core.BaseTool {
 					Role        string   `json:"role"`
 					Permissions []string `json:"permissions"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				if p.Role == "" {
 					p.Role = "admin"
 				}
@@ -208,7 +222,9 @@ func BuildAdminTools(c *client.Client) []*core.BaseTool {
 					Role        string   `json:"role"`
 					Permissions []string `json:"permissions"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				payload := map[string]interface{}{"cmd": "update-admin", "admin": p.AdminID}
 				if p.Name != "" {
 					payload["name"] = p.Name
@@ -226,12 +242,12 @@ func BuildAdminTools(c *client.Client) []*core.BaseTool {
 			},
 		},
 		{
-			ToolName: "admin_revoke_super", ToolDesc: "Delete an admin entirely (revoke from all sites)",
+			ToolName: "admin_revoke_super", ToolDesc: "Revoke an administrator’s super-admin privileges",
 			ToolCategory: permissions.CatSystem, ToolAction: permissions.ActionDelete, Mutating: true,
 			Schema: json.RawMessage(`{
 				"type": "object",
 				"properties": {
-					"admin_id": {"type": "string", "description": "Admin _id to delete entirely"}
+					"admin_id": {"type": "string", "description": "Admin _id whose super-admin privileges should be revoked"}
 				},
 				"required": ["admin_id"]
 			}`),
@@ -240,7 +256,9 @@ func BuildAdminTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					AdminID string `json:"admin_id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/sitemgr", map[string]interface{}{
 					"cmd": "revoke-super-admin", "admin": p.AdminID,
 				})

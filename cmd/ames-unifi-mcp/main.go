@@ -125,7 +125,10 @@ func registerLazyTools(s *server.MCPServer, registry *tools.Registry, cfg *confi
 		if cfg.NeedsAuth {
 			return authGate(cfg), nil
 		}
-		input, _ := json.Marshal(req.Params.Arguments)
+		input, err := toolInput(req)
+		if err != nil {
+			return mcp.NewToolResultError(err.Error()), nil
+		}
 		data, err := indexTool.Execute(ctx, input)
 		if err != nil {
 			return mcp.NewToolResultError(err.Error()), nil
@@ -143,7 +146,10 @@ func registerLazyTools(s *server.MCPServer, registry *tools.Registry, cfg *confi
 		if cfg.NeedsAuth {
 			return authGate(cfg), nil
 		}
-		input, _ := json.Marshal(req.Params.Arguments)
+		input, err := toolInput(req)
+		if err != nil {
+			return mcp.NewToolResultError(err.Error()), nil
+		}
 		data, err := execTool.Execute(ctx, input)
 		if err != nil {
 			return mcp.NewToolResultError(err.Error()), nil
@@ -161,7 +167,10 @@ func registerLazyTools(s *server.MCPServer, registry *tools.Registry, cfg *confi
 		if cfg.NeedsAuth {
 			return authGate(cfg), nil
 		}
-		input, _ := json.Marshal(req.Params.Arguments)
+		input, err := toolInput(req)
+		if err != nil {
+			return mcp.NewToolResultError(err.Error()), nil
+		}
 		data, err := batchTool.Execute(ctx, input)
 		if err != nil {
 			return mcp.NewToolResultError(err.Error()), nil
@@ -181,7 +190,10 @@ func registerEagerTools(s *server.MCPServer, registry *tools.Registry, cfg *conf
 			if cfg.NeedsAuth {
 				return authGate(cfg), nil
 			}
-			input, _ := json.Marshal(req.Params.Arguments)
+			input, err := toolInput(req)
+			if err != nil {
+				return mcp.NewToolResultError(err.Error()), nil
+			}
 			data, err := tool.Execute(ctx, input)
 			if err != nil {
 				return mcp.NewToolResultError(err.Error()), nil
@@ -204,4 +216,16 @@ func rawToSchema(raw json.RawMessage) mcp.ToolInputSchema {
 		schema.Type = "object"
 	}
 	return schema
+}
+
+// toolInput treats omitted arguments as an empty object, while retaining explicit
+// null and other malformed values for schema validation to reject.
+func toolInput(req mcp.CallToolRequest) (json.RawMessage, error) {
+	if len(req.Params.RawArguments) > 0 {
+		return req.Params.RawArguments, nil
+	}
+	if req.Params.Arguments == nil {
+		return json.RawMessage(`{}`), nil
+	}
+	return json.Marshal(req.Params.Arguments)
 }

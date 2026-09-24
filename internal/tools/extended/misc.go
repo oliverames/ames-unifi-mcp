@@ -72,7 +72,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", sp()+"/rest/dynamicdns/"+p.ID, p.Config)
 			},
 		},
@@ -130,7 +132,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/rest/dpigroup", p.Config)
 			},
 		},
@@ -144,7 +148,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", sp()+"/rest/dpigroup/"+p.ID, p.Config)
 			},
 		},
@@ -156,7 +162,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "DELETE", sp()+"/rest/dpigroup/"+p.ID, nil)
 			},
 		},
@@ -218,7 +226,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					Within int `json:"within"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				if p.Within == 0 {
 					p.Within = 8760
 				}
@@ -269,7 +279,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 					Archived bool   `json:"archived"`
 					Key      string `json:"key"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				payload := map[string]interface{}{"archived": p.Archived}
 				if p.Key != "" {
 					payload["key"] = p.Key
@@ -303,7 +315,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/rest/rogueknown", p.Config)
 			},
 		},
@@ -315,7 +329,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "DELETE", sp()+"/rest/rogueknown/"+p.ID, nil)
 			},
 		},
@@ -329,7 +345,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 					Resource string `json:"resource"`
 					Filter   string `json:"filter"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				path := sp() + "/cnt/" + p.Resource
 				if p.Filter != "" {
 					path += "?" + p.Filter
@@ -364,7 +382,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					Filename string `json:"filename"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/backup", map[string]interface{}{
 					"cmd": "restore-site", "filename": p.Filename,
 				})
@@ -380,7 +400,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/rest/hotspotop", p.Config)
 			},
 		},
@@ -394,7 +416,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", sp()+"/rest/hotspotop/"+p.ID, p.Config)
 			},
 		},
@@ -406,7 +430,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "DELETE", sp()+"/rest/hotspotop/"+p.ID, nil)
 			},
 		},
@@ -420,7 +446,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/rest/hotspot2conf", p.Config)
 			},
 		},
@@ -434,7 +462,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", sp()+"/rest/hotspot2conf/"+p.ID, p.Config)
 			},
 		},
@@ -446,7 +476,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "DELETE", sp()+"/rest/hotspot2conf/"+p.ID, nil)
 			},
 		},
@@ -460,7 +492,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/rest/hotspotpackage", p.Config)
 			},
 		},
@@ -474,7 +508,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", sp()+"/rest/hotspotpackage/"+p.ID, p.Config)
 			},
 		},
@@ -486,7 +522,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "DELETE", sp()+"/rest/hotspotpackage/"+p.ID, nil)
 			},
 		},
@@ -500,7 +538,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/rest/scheduletask", p.Config)
 			},
 		},
@@ -514,7 +554,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", sp()+"/rest/scheduletask/"+p.ID, p.Config)
 			},
 		},
@@ -526,7 +568,9 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "DELETE", sp()+"/rest/scheduletask/"+p.ID, nil)
 			},
 		},

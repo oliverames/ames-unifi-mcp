@@ -35,7 +35,9 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Within int `json:"within"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				if p.Within == 0 {
 					p.Within = 8760
 				}
@@ -52,7 +54,9 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Mac string `json:"mac"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "GET", sp()+"/stat/sta/"+p.Mac, nil)
 			},
 		},
@@ -64,7 +68,9 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Mac string `json:"mac"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/stamgr", map[string]interface{}{"cmd": "block-sta", "mac": p.Mac})
 			},
 		},
@@ -76,7 +82,9 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Mac string `json:"mac"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/stamgr", map[string]interface{}{"cmd": "unblock-sta", "mac": p.Mac})
 			},
 		},
@@ -88,7 +96,9 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Mac string `json:"mac"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/stamgr", map[string]interface{}{"cmd": "kick-sta", "mac": p.Mac})
 			},
 		},
@@ -100,7 +110,9 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Mac string `json:"mac"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/stamgr", map[string]interface{}{"cmd": "forget-sta", "macs": []string{p.Mac}})
 			},
 		},
@@ -120,7 +132,9 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Mac string `json:"mac"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "GET", sp()+"/stat/user/"+p.Mac, nil)
 			},
 		},
@@ -141,7 +155,9 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 					ID   string `json:"id"`
 					Name string `json:"name"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/upd/user/"+p.ID, map[string]interface{}{"name": p.Name})
 			},
 		},
@@ -162,7 +178,9 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", sp()+"/rest/user/"+p.ID, p.Config)
 			},
 		},
@@ -191,7 +209,9 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ClientID string `json:"client_id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				base := c.Config().BaseURL() + "/integration"
 				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/clients/%s", base, c.Site(), p.ClientID), nil)
 			},
@@ -213,7 +233,9 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 					ClientID string          `json:"client_id"`
 					Config   json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				base := c.Config().BaseURL() + "/integration"
 				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/clients/%s/actions", base, c.Site(), p.ClientID), p.Config)
 			},
@@ -238,7 +260,9 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 					End   int64  `json:"end"`
 					Type  string `json:"type"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				if p.Type == "" {
 					p.Type = "all"
 				}

@@ -29,7 +29,9 @@ func BuildWLANTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "GET", sp()+"/rest/wlanconf/"+p.ID, nil)
 			},
 		},
@@ -48,7 +50,9 @@ func BuildWLANTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/rest/wlanconf", p.Config)
 			},
 		},
@@ -69,7 +73,9 @@ func BuildWLANTools(c *client.Client) []*BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", sp()+"/rest/wlanconf/"+p.ID, p.Config)
 			},
 		},
@@ -81,7 +87,9 @@ func BuildWLANTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "DELETE", sp()+"/rest/wlanconf/"+p.ID, nil)
 			},
 		},
@@ -93,7 +101,9 @@ func BuildWLANTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", sp()+"/rest/wlanconf/"+p.ID, map[string]interface{}{"enabled": true})
 			},
 		},
@@ -105,7 +115,9 @@ func BuildWLANTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", sp()+"/rest/wlanconf/"+p.ID, map[string]interface{}{"enabled": false})
 			},
 		},

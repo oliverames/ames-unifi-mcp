@@ -33,7 +33,9 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/switching/switch-stacks/%s", base, c.Site(), p.ID), nil)
 			},
 		},
@@ -45,7 +47,9 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/switching/switch-stacks", base, c.Site()), p.Config)
 			},
 		},
@@ -58,7 +62,9 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "PUT", fmt.Sprintf("%s/v1/sites/%s/switching/switch-stacks/%s", base, c.Site(), p.ID), p.Config)
 			},
 		},
@@ -70,7 +76,9 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/switching/switch-stacks/%s", base, c.Site(), p.ID), nil)
 			},
 		},
@@ -91,7 +99,9 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/switching/lags/%s", base, c.Site(), p.ID), nil)
 			},
 		},
@@ -103,7 +113,9 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/switching/lags", base, c.Site()), p.Config)
 			},
 		},
@@ -116,7 +128,9 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "PUT", fmt.Sprintf("%s/v1/sites/%s/switching/lags/%s", base, c.Site(), p.ID), p.Config)
 			},
 		},
@@ -128,7 +142,9 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/switching/lags/%s", base, c.Site(), p.ID), nil)
 			},
 		},
@@ -149,7 +165,9 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/switching/mc-lag-domains/%s", base, c.Site(), p.ID), nil)
 			},
 		},
@@ -161,7 +179,9 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/switching/mc-lag-domains", base, c.Site()), p.Config)
 			},
 		},
@@ -174,7 +194,9 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "PUT", fmt.Sprintf("%s/v1/sites/%s/switching/mc-lag-domains/%s", base, c.Site(), p.ID), p.Config)
 			},
 		},
@@ -186,7 +208,9 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/switching/mc-lag-domains/%s", base, c.Site(), p.ID), nil)
 			},
 		},

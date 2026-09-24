@@ -35,7 +35,9 @@ func BuildPoETools(c *client.Client) []*core.BaseTool {
 					Mac     string `json:"mac"`
 					PortIdx int    `json:"port_idx"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/devmgr", map[string]interface{}{
 					"cmd": "power-cycle", "mac": p.Mac, "port_idx": p.PortIdx,
 				})

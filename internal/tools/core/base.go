@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/oliverames/ames-unifi-mcp/internal/client"
+	"github.com/oliverames/ames-unifi-mcp/internal/inputvalidation"
 	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
 )
 
@@ -36,6 +37,9 @@ func (b *BaseTool) MinVersion() string             { return b.MinVer }
 func (b *BaseTool) IsUndocumented() bool           { return b.Undocumented }
 
 func (b *BaseTool) Execute(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
+	if err := inputvalidation.Validate(b.Schema, input); err != nil {
+		return nil, fmt.Errorf("%s: %w", b.ToolName, err)
+	}
 	if b.Handler == nil {
 		return nil, fmt.Errorf("no handler for tool %s", b.ToolName)
 	}

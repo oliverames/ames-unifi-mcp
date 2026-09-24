@@ -175,12 +175,18 @@ func (c *Client) Do(ctx context.Context, method, path string, payload interface{
 		if err != nil {
 			return nil, fmt.Errorf("creating retry request: %w", err)
 		}
+		if err := c.validateRequestURL(req2.URL); err != nil {
+			return nil, err
+		}
 		resp2, err := c.httpClient.Do(req2)
 		if err != nil {
 			return nil, err
 		}
-		respBody, truncated, _ = readLimitedBody(resp2.Body)
+		respBody, truncated, err = readLimitedBody(resp2.Body)
 		resp2.Body.Close()
+		if err != nil {
+			return nil, fmt.Errorf("reading response after re-login: %w", err)
+		}
 		if truncated {
 			return nil, fmt.Errorf("response body exceeded %d byte limit after re-login", maxResponseBodyBytes)
 		}
@@ -268,12 +274,18 @@ func (c *Client) DoRaw(ctx context.Context, method, fullURL string, payload inte
 		if err != nil {
 			return nil, fmt.Errorf("creating retry request: %w", err)
 		}
+		if err := c.validateRequestURL(req2.URL); err != nil {
+			return nil, err
+		}
 		resp2, err := c.httpClient.Do(req2)
 		if err != nil {
 			return nil, err
 		}
-		body, truncated, _ = readLimitedBody(resp2.Body)
+		body, truncated, err = readLimitedBody(resp2.Body)
 		resp2.Body.Close()
+		if err != nil {
+			return nil, fmt.Errorf("reading response after re-login: %w", err)
+		}
 		if truncated {
 			return nil, fmt.Errorf("response body exceeded %d byte limit after re-login", maxResponseBodyBytes)
 		}
@@ -324,12 +336,11 @@ func (c *Client) setHeaders(req *http.Request) {
 	}
 }
 
+// Only GET and HEAD are replayed after ambiguous transport/server failures.
+// Even a failed mutation response can follow a successfully committed write.
 func (c *Client) doWithRetry(newReq func() (*http.Request, error), maxRetries int) (*http.Response, error) {
 	var lastErr error
 	for attempt := 0; attempt <= maxRetries; attempt++ {
-		if attempt > 0 {
-			time.Sleep(time.Duration(attempt*attempt) * 500 * time.Millisecond)
-		}
 		req, err := newReq()
 		if err != nil {
 			return nil, fmt.Errorf("creating request: %w", err)
@@ -337,13 +348,28 @@ func (c *Client) doWithRetry(newReq func() (*http.Request, error), maxRetries in
 		if err := c.validateRequestURL(req.URL); err != nil {
 			return nil, err
 		}
+		if err := req.Context().Err(); err != nil {
+			return nil, err
+		}
+		if attempt > 0 {
+			timer := time.NewTimer(time.Duration(attempt*attempt) * 500 * time.Millisecond)
+			select {
+			case <-req.Context().Done():
+				timer.Stop()
+				return nil, req.Context().Err()
+			case <-timer.C:
+			}
+		}
+		retryable := req.Method == http.MethodGet || req.Method == http.MethodHead
 		resp, err := c.httpClient.Do(req)
 		if err != nil {
+			if !retryable {
+				return nil, fmt.Errorf("request failed without retry; mutation outcome may be unknown: %w", err)
+			}
 			lastErr = err
 			continue
 		}
-		// Retry on 5xx or 429
-		if resp.StatusCode == http.StatusTooManyRequests || resp.StatusCode >= 500 {
+		if retryable && (resp.StatusCode == http.StatusTooManyRequests || resp.StatusCode >= 500) {
 			resp.Body.Close()
 			lastErr = fmt.Errorf("HTTP %d", resp.StatusCode)
 			continue

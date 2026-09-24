@@ -56,6 +56,7 @@ func TestConfirmGate_DryRunRedactsSensitiveParameters(t *testing.T) {
 	gated := WithConfirm(inner)
 
 	input := json.RawMessage(`{
+		"mac": "aa:bb:cc:dd:ee:ff",
 		"username": "admin",
 		"password": "secret-password",
 		"config": {

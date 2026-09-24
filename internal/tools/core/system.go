@@ -143,7 +143,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 					Key    string                 `json:"key"`
 					Config map[string]interface{} `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/set/setting/"+p.Key, p.Config)
 			},
 		},
@@ -158,7 +160,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 					ID     string                 `json:"id"`
 					Config map[string]interface{} `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", sp()+"/set/setting/"+p.Key+"/"+p.ID, p.Config)
 			},
 		},
@@ -171,7 +175,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Enabled bool `json:"enabled"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/set/setting/mgmt", map[string]interface{}{"led_enabled": p.Enabled})
 			},
 		},
@@ -184,7 +190,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Config map[string]interface{} `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/set/setting/ips", p.Config)
 			},
 		},
@@ -197,7 +205,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Config map[string]interface{} `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/rest/portforward", p.Config)
 			},
 		},
@@ -211,7 +221,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 					ID     string                 `json:"id"`
 					Config map[string]interface{} `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", sp()+"/rest/portforward/"+p.ID, p.Config)
 			},
 		},
@@ -223,7 +235,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "DELETE", sp()+"/rest/portforward/"+p.ID, nil)
 			},
 		},
@@ -236,7 +250,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Config map[string]interface{} `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/rest/routing", p.Config)
 			},
 		},
@@ -250,7 +266,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 					ID     string                 `json:"id"`
 					Config map[string]interface{} `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", sp()+"/rest/routing/"+p.ID, p.Config)
 			},
 		},
@@ -262,7 +280,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "DELETE", sp()+"/rest/routing/"+p.ID, nil)
 			},
 		},
@@ -283,7 +303,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Config map[string]interface{} `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/rest/usergroup", p.Config)
 			},
 		},
@@ -297,7 +319,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 					ID     string                 `json:"id"`
 					Config map[string]interface{} `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", sp()+"/rest/usergroup/"+p.ID, p.Config)
 			},
 		},
@@ -309,7 +333,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "DELETE", sp()+"/rest/usergroup/"+p.ID, nil)
 			},
 		},
@@ -322,7 +348,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Key string `json:"key"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "GET", sp()+"/get/setting/"+p.Key, nil)
 			},
 		},
@@ -343,7 +371,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/rest/portconf", p.Config)
 			},
 		},
@@ -357,7 +387,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", sp()+"/rest/portconf/"+p.ID, p.Config)
 			},
 		},
@@ -369,7 +401,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "DELETE", sp()+"/rest/portconf/"+p.ID, nil)
 			},
 		},
@@ -390,7 +424,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Config map[string]interface{} `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/rest/dhcpoption", p.Config)
 			},
 		},
@@ -404,7 +440,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 					ID     string                 `json:"id"`
 					Config map[string]interface{} `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", sp()+"/rest/dhcpoption/"+p.ID, p.Config)
 			},
 		},
@@ -416,7 +454,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "DELETE", sp()+"/rest/dhcpoption/"+p.ID, nil)
 			},
 		},
@@ -445,7 +485,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/rest/radiusprofile", p.Config)
 			},
 		},
@@ -459,7 +501,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", sp()+"/rest/radiusprofile/"+p.ID, p.Config)
 			},
 		},
@@ -471,7 +515,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "DELETE", sp()+"/rest/radiusprofile/"+p.ID, nil)
 			},
 		},
@@ -484,7 +530,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/rest/account", p.Config)
 			},
 		},
@@ -498,7 +546,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", sp()+"/rest/account/"+p.ID, p.Config)
 			},
 		},
@@ -510,7 +560,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "DELETE", sp()+"/rest/account/"+p.ID, nil)
 			},
 		},
@@ -531,7 +583,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Config map[string]interface{} `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/rest/tag", p.Config)
 			},
 		},
@@ -545,7 +599,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", sp()+"/rest/tag/"+p.ID, p.Config)
 			},
 		},
@@ -557,7 +613,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "DELETE", sp()+"/rest/tag/"+p.ID, nil)
 			},
 		},
@@ -570,7 +628,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Filename string `json:"filename"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/backup", map[string]interface{}{
 					"cmd": "delete-backup", "filename": p.Filename,
 				})
@@ -585,7 +645,9 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				var p struct {
 					NetworkID string `json:"network_id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/networks/%s/references", base, c.Site(), p.NetworkID), nil)
 			},
 		},

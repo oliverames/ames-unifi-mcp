@@ -30,7 +30,9 @@ func BuildSyslogTools(c *client.Client) []*core.BaseTool {
 					Class  string          `json:"class"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				path := fmt.Sprintf("v2/api/site/%s/system-log/%s", c.Site(), p.Class)
 				var payload interface{}
 				if len(p.Config) > 0 && string(p.Config) != "null" {
@@ -55,7 +57,9 @@ func BuildSyslogTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					Source string `json:"source"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "GET", "v2/api/fingerprint_devices/"+p.Source, nil)
 			},
 		},

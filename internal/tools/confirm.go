@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/oliverames/ames-unifi-mcp/internal/inputvalidation"
 	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
 )
 
@@ -57,6 +58,9 @@ func (g *ConfirmGate) InputSchema() json.RawMessage {
 }
 
 func (g *ConfirmGate) Execute(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
+	if err := inputvalidation.Validate(g.InputSchema(), input); err != nil {
+		return nil, err
+	}
 	var params map[string]interface{}
 	if err := json.Unmarshal(input, &params); err != nil {
 		return nil, fmt.Errorf("parsing input: %w", err)

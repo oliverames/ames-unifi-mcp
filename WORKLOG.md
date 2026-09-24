@@ -1,5 +1,15 @@
 # Worklog
 
+## 2026-09-24 — request retry and input validation (#14, #15)
+
+Requests now retry ambiguous network/429/5xx failures only for GET/HEAD. Mutations return the first outcome instead of risking duplicate writes. Backoff honors cancellation. Re-login retries revalidate the destination and preserve response-body errors. Fake transports reproduce the previous duplicate POST and swallowed errors, then pass with the fix. A definite unauthorized response retains the existing one-time session refresh behavior.
+
+Tool input is validated against its declared schema before dispatch or confirmation preview. Required routing identifiers reject empty/path syntax, MACs use the documented lowercase colon format, and every ignored handler JSON decoding error is checked. Opaque legacy IDs, declared non-string IDs, arbitrary configuration objects, and optional empty filters remain supported. Corrected admin_revoke_super wording without changing its command. Omitted MCP arguments normalize to an empty object; explicit malformed values remain rejected. The 310-tool catalog is unchanged.
+
+Validation: full race tests and vet pass, all four Darwin/Linux release targets build, staticcheck 2026.1 passes with Go 1.26.5, module verification and Node packaging syntax checks pass. govulncheck v1.6.0 reports no reachable vulnerabilities under local Go 1.27.1. The CI-pinned Go 1.26.5 scan reports four reachable standard-library advisories fixed in 1.26.6, tracked separately in #20. Staticcheck 2026.1 cannot read Go 1.27.1 export data, also recorded there. Tests use inert transports/local fixtures only, with no real controller calls.
+
+Separate confirmed follow-up: #19 tracks integer precision loss in the existing confirmation JSON round-trip. Neither #19 nor the older authentication/version-routing issues #11–#13 were folded into these fixes. No npm publication, installed binary replacement, or live network setting change occurred.
+
 ## 2026-07-22 - Merge routine action maintenance
 
 **What changed**: Merged the three open GitHub Actions maintenance pull requests through PRs #6, #7, and #8. The repository now uses the approved checkout, setup-node, and CodeQL revisions from that batch.

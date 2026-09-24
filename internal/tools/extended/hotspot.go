@@ -39,7 +39,9 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 					Bytes   int    `json:"bytes,omitempty"`
 					APMac   string `json:"ap_mac,omitempty"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				payload := map[string]interface{}{"cmd": "authorize-guest", "mac": p.Mac, "minutes": p.Minutes}
 				if p.Up > 0 {
 					payload["up"] = p.Up
@@ -64,7 +66,9 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					Mac string `json:"mac"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/stamgr", map[string]interface{}{"cmd": "unauthorize-guest", "mac": p.Mac})
 			},
 		},
@@ -77,7 +81,9 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					Within int `json:"within"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				if p.Within == 0 {
 					p.Within = 24
 				}
@@ -111,7 +117,9 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 					Down          int    `json:"down,omitempty"`
 					Bytes         int    `json:"bytes,omitempty"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				if p.Count == 0 {
 					p.Count = 1
 				}
@@ -145,7 +153,9 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/hotspot", map[string]interface{}{
 					"cmd": "delete-voucher", "_id": p.ID,
 				})
@@ -159,7 +169,9 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/hotspot", map[string]interface{}{
 					"cmd": "extend", "_id": p.ID,
 				})
@@ -183,7 +195,9 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				base := c.Config().BaseURL() + "/integration"
 				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/hotspot/vouchers/%s", base, c.Site(), p.ID), nil)
 			},
@@ -197,7 +211,9 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				base := c.Config().BaseURL() + "/integration"
 				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/hotspot/vouchers", base, c.Site()), p.Config)
 			},
@@ -210,7 +226,9 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				base := c.Config().BaseURL() + "/integration"
 				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/hotspot/vouchers/%s", base, c.Site(), p.ID), nil)
 			},

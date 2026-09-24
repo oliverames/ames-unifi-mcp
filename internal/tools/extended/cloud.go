@@ -32,7 +32,9 @@ func BuildCloudTools(c *client.Client) []*core.BaseTool {
 					PageSize  string `json:"pageSize"`
 					NextToken string `json:"nextToken"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				u := baseURL + "/v1/hosts"
 				sep := "?"
 				if p.PageSize != "" {
@@ -53,7 +55,9 @@ func BuildCloudTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, http.MethodGet, baseURL+"/v1/hosts/"+p.ID, nil)
 			},
 		},
@@ -66,7 +70,9 @@ func BuildCloudTools(c *client.Client) []*core.BaseTool {
 					PageSize  string `json:"pageSize"`
 					NextToken string `json:"nextToken"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				u := baseURL + "/v1/sites"
 				sep := "?"
 				if p.PageSize != "" {
@@ -93,7 +99,9 @@ func BuildCloudTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					HostIDs []string `json:"hostIds"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				u := baseURL + "/v1/devices"
 				for i, id := range p.HostIDs {
 					if i == 0 {
@@ -123,7 +131,9 @@ func BuildCloudTools(c *client.Client) []*core.BaseTool {
 					Type     string `json:"type"`
 					Duration string `json:"duration"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				u := baseURL + "/v1/isp-metrics/" + p.Type
 				if p.Duration != "" {
 					u += "?duration=" + p.Duration
@@ -148,7 +158,9 @@ func BuildCloudTools(c *client.Client) []*core.BaseTool {
 					Type   string          `json:"type"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, http.MethodPost, baseURL+"/v1/isp-metrics/"+p.Type+"/query", p.Config)
 			},
 		},
@@ -168,7 +180,9 @@ func BuildCloudTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, http.MethodGet, baseURL+"/v1/sd-wan-configs/"+p.ID, nil)
 			},
 		},
@@ -180,7 +194,9 @@ func BuildCloudTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, http.MethodGet, baseURL+"/v1/sd-wan-configs/"+p.ID+"/status", nil)
 			},
 		},

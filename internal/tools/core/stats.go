@@ -39,7 +39,9 @@ func BuildStatsTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Scale string `json:"scale"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				path := sp() + "/stat/dashboard"
 				if p.Scale != "" {
 					path += "?scale=" + p.Scale
@@ -56,7 +58,9 @@ func BuildStatsTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Type string `json:"type"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				if p.Type == "" {
 					p.Type = "by_app"
 				}
@@ -73,7 +77,9 @@ func BuildStatsTools(c *client.Client) []*BaseTool {
 					Mac  string `json:"mac"`
 					Type string `json:"type"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				if p.Type == "" {
 					p.Type = "by_app"
 				}
@@ -121,7 +127,9 @@ func BuildStatsTools(c *client.Client) []*BaseTool {
 					Attrs    []string `json:"attrs,omitempty"`
 					Macs     []string `json:"macs,omitempty"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				payload := map[string]interface{}{"start": p.Start, "end": p.End}
 				if len(p.Attrs) > 0 {
 					payload["attrs"] = p.Attrs
@@ -143,7 +151,9 @@ func BuildStatsTools(c *client.Client) []*BaseTool {
 					End   int64 `json:"end"`
 					Limit int   `json:"limit"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				if p.Limit == 0 {
 					p.Limit = 1000
 				}
@@ -161,7 +171,9 @@ func BuildStatsTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Within int `json:"within"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				if p.Within == 0 {
 					p.Within = 24
 				}
@@ -251,7 +263,9 @@ func BuildStatsTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Mac string `json:"mac"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "GET", sp()+"/stat/spectrumscan/"+p.Mac, nil)
 			},
 		},
@@ -264,7 +278,9 @@ func BuildStatsTools(c *client.Client) []*BaseTool {
 				var p struct {
 					CreateTime *int64 `json:"create_time,omitempty"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				var payload map[string]interface{}
 				if p.CreateTime != nil {
 					payload = map[string]interface{}{"create_time": *p.CreateTime}
@@ -282,7 +298,9 @@ func BuildStatsTools(c *client.Client) []*BaseTool {
 					Start int64 `json:"start"`
 					End   int64 `json:"end"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/stat/authorization", map[string]interface{}{
 					"start": p.Start, "end": p.End,
 				})

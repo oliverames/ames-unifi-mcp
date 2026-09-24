@@ -31,7 +31,9 @@ func BuildNetworkTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/networks/%s", base, c.Site(), p.ID), nil)
 			},
 		},
@@ -44,7 +46,9 @@ func BuildNetworkTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/networks", base, c.Site()), p.Config)
 			},
 		},
@@ -58,7 +62,9 @@ func BuildNetworkTools(c *client.Client) []*BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "PUT", fmt.Sprintf("%s/v1/sites/%s/networks/%s", base, c.Site(), p.ID), p.Config)
 			},
 		},
@@ -70,7 +76,9 @@ func BuildNetworkTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/networks/%s", base, c.Site(), p.ID), nil)
 			},
 		},
@@ -91,7 +99,9 @@ func BuildNetworkTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "GET", sp()+"/rest/networkconf/"+p.ID, nil)
 			},
 		},
@@ -110,7 +120,9 @@ func BuildNetworkTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/rest/networkconf", p.Config)
 			},
 		},
@@ -131,7 +143,9 @@ func BuildNetworkTools(c *client.Client) []*BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", sp()+"/rest/networkconf/"+p.ID, p.Config)
 			},
 		},
@@ -143,7 +157,9 @@ func BuildNetworkTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "DELETE", sp()+"/rest/networkconf/"+p.ID, nil)
 			},
 		},

@@ -30,7 +30,9 @@ func BuildDNSTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/dns/policies", base, c.Site()), p.Config)
 			},
 		},
@@ -42,7 +44,9 @@ func BuildDNSTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/dns/policies/%s", base, c.Site(), p.ID), nil)
 			},
 		},
@@ -56,7 +60,9 @@ func BuildDNSTools(c *client.Client) []*BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "PUT", fmt.Sprintf("%s/v1/sites/%s/dns/policies/%s", base, c.Site(), p.ID), p.Config)
 			},
 		},
@@ -68,7 +74,9 @@ func BuildDNSTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/dns/policies/%s", base, c.Site(), p.ID), nil)
 			},
 		},

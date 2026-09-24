@@ -23,7 +23,9 @@ func BuildEventTools(c *client.Client) []*BaseTool {
 					Within int `json:"within"`
 					Limit  int `json:"limit"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				if p.Within == 0 {
 					p.Within = 720
 				}
@@ -44,7 +46,9 @@ func BuildEventTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Archived *bool `json:"archived"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				path := sp() + "/rest/alarm"
 				if p.Archived == nil || !*p.Archived {
 					path += "?archived=false"
@@ -68,7 +72,9 @@ func BuildEventTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", sp()+"/cmd/evtmgr", map[string]interface{}{"cmd": "archive-alarm", "_id": p.ID})
 			},
 		},

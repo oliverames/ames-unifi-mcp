@@ -32,7 +32,9 @@ func BuildAPGroupTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "GET", ap()+"/"+p.ID, nil)
 			},
 		},
@@ -52,7 +54,9 @@ func BuildAPGroupTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", ap(), p.Config)
 			},
 		},
@@ -74,7 +78,9 @@ func BuildAPGroupTools(c *client.Client) []*core.BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", ap()+"/"+p.ID, p.Config)
 			},
 		},
@@ -87,7 +93,9 @@ func BuildAPGroupTools(c *client.Client) []*core.BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "DELETE", ap()+"/"+p.ID, nil)
 			},
 		},

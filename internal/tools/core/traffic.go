@@ -31,7 +31,9 @@ func BuildTrafficTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", fmt.Sprintf("v2/api/site/%s/trafficrules", c.Site()), p.Config)
 			},
 		},
@@ -43,7 +45,9 @@ func BuildTrafficTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "GET", fmt.Sprintf("v2/api/site/%s/trafficrules/%s", c.Site(), p.ID), nil)
 			},
 		},
@@ -57,7 +61,9 @@ func BuildTrafficTools(c *client.Client) []*BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", fmt.Sprintf("v2/api/site/%s/trafficrules/%s", c.Site(), p.ID), p.Config)
 			},
 		},
@@ -69,7 +75,9 @@ func BuildTrafficTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "DELETE", fmt.Sprintf("v2/api/site/%s/trafficrules/%s", c.Site(), p.ID), nil)
 			},
 		},
@@ -91,7 +99,9 @@ func BuildTrafficTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "GET", fmt.Sprintf("v2/api/site/%s/trafficroutes/%s", c.Site(), p.ID), nil)
 			},
 		},
@@ -104,7 +114,9 @@ func BuildTrafficTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "POST", fmt.Sprintf("v2/api/site/%s/trafficroutes", c.Site()), p.Config)
 			},
 		},
@@ -118,7 +130,9 @@ func BuildTrafficTools(c *client.Client) []*BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "PUT", fmt.Sprintf("v2/api/site/%s/trafficroutes/%s", c.Site(), p.ID), p.Config)
 			},
 		},
@@ -130,7 +144,9 @@ func BuildTrafficTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.Do(ctx, "DELETE", fmt.Sprintf("v2/api/site/%s/trafficroutes/%s", c.Site(), p.ID), nil)
 			},
 		},
@@ -153,7 +169,9 @@ func BuildTrafficTools(c *client.Client) []*BaseTool {
 				var p struct {
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/traffic-matching-lists", base, c.Site()), p.Config)
 			},
 		},
@@ -165,7 +183,9 @@ func BuildTrafficTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/traffic-matching-lists/%s", base, c.Site(), p.ID), nil)
 			},
 		},
@@ -179,7 +199,9 @@ func BuildTrafficTools(c *client.Client) []*BaseTool {
 					ID     string          `json:"id"`
 					Config json.RawMessage `json:"config"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "PUT", fmt.Sprintf("%s/v1/sites/%s/traffic-matching-lists/%s", base, c.Site(), p.ID), p.Config)
 			},
 		},
@@ -191,7 +213,9 @@ func BuildTrafficTools(c *client.Client) []*BaseTool {
 				var p struct {
 					ID string `json:"id"`
 				}
-				json.Unmarshal(input, &p)
+				if err := json.Unmarshal(input, &p); err != nil {
+					return nil, fmt.Errorf("parsing input: %w", err)
+				}
 				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/traffic-matching-lists/%s", base, c.Site(), p.ID), nil)
 			},
 		},

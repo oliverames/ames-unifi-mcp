@@ -151,7 +151,6 @@ func BuildFirewallLegacyTools(c *client.Client) []*BaseTool {
 }
 
 func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
-	base := c.Config().BaseURL() + "/integration"
 
 	return []*BaseTool{
 		{
@@ -159,7 +158,7 @@ func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatFirewall, ToolAction: permissions.ActionRead, MinVer: "9.0.0",
 			Schema: noInputSchema(), Client: c,
 			Handler: func(ctx context.Context, _ json.RawMessage) (json.RawMessage, error) {
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/firewall/zones", base, c.Site()), nil)
+				return c.DoIntegrationSite(ctx, "GET", "/firewall/zones", nil)
 			},
 		},
 		{
@@ -174,7 +173,7 @@ func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/firewall/zones", base, c.Site()), p.Config)
+				return c.DoIntegrationSite(ctx, "POST", "/firewall/zones", p.Config)
 			},
 		},
 		{
@@ -188,7 +187,7 @@ func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/firewall/zones/%s", base, c.Site(), p.ID), nil)
+				return c.DoIntegrationSite(ctx, "GET", fmt.Sprintf("/firewall/zones/%s", p.ID), nil)
 			},
 		},
 		{
@@ -204,7 +203,7 @@ func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "PUT", fmt.Sprintf("%s/v1/sites/%s/firewall/zones/%s", base, c.Site(), p.ID), p.Config)
+				return c.DoIntegrationSite(ctx, "PUT", fmt.Sprintf("/firewall/zones/%s", p.ID), p.Config)
 			},
 		},
 		{
@@ -218,7 +217,7 @@ func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/firewall/zones/%s", base, c.Site(), p.ID), nil)
+				return c.DoIntegrationSite(ctx, "DELETE", fmt.Sprintf("/firewall/zones/%s", p.ID), nil)
 			},
 		},
 		{
@@ -226,7 +225,7 @@ func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatFirewall, ToolAction: permissions.ActionRead, MinVer: "9.0.0",
 			Schema: noInputSchema(), Client: c,
 			Handler: func(ctx context.Context, _ json.RawMessage) (json.RawMessage, error) {
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/firewall/policies", base, c.Site()), nil)
+				return c.DoIntegrationSite(ctx, "GET", "/firewall/policies", nil)
 			},
 		},
 		{
@@ -240,7 +239,7 @@ func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/firewall/policies/%s", base, c.Site(), p.ID), nil)
+				return c.DoIntegrationSite(ctx, "GET", fmt.Sprintf("/firewall/policies/%s", p.ID), nil)
 			},
 		},
 		{
@@ -255,7 +254,7 @@ func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/firewall/policies", base, c.Site()), p.Config)
+				return c.DoIntegrationSite(ctx, "POST", "/firewall/policies", p.Config)
 			},
 		},
 		{
@@ -271,7 +270,7 @@ func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "PUT", fmt.Sprintf("%s/v1/sites/%s/firewall/policies/%s", base, c.Site(), p.ID), p.Config)
+				return c.DoIntegrationSite(ctx, "PUT", fmt.Sprintf("/firewall/policies/%s", p.ID), p.Config)
 			},
 		},
 		{
@@ -285,7 +284,7 @@ func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/firewall/policies/%s", base, c.Site(), p.ID), nil)
+				return c.DoIntegrationSite(ctx, "DELETE", fmt.Sprintf("/firewall/policies/%s", p.ID), nil)
 			},
 		},
 		{
@@ -301,7 +300,7 @@ func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "PATCH", fmt.Sprintf("%s/v1/sites/%s/firewall/policies/%s", base, c.Site(), p.ID), p.Config)
+				return c.DoIntegrationSite(ctx, "PATCH", fmt.Sprintf("/firewall/policies/%s", p.ID), p.Config)
 			},
 		},
 		{
@@ -309,7 +308,7 @@ func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatFirewall, ToolAction: permissions.ActionRead, MinVer: "9.0.0",
 			Schema: noInputSchema(), Client: c,
 			Handler: func(ctx context.Context, _ json.RawMessage) (json.RawMessage, error) {
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/firewall/policies/ordering", base, c.Site()), nil)
+				return c.DoIntegrationSite(ctx, "GET", "/firewall/policies/ordering", nil)
 			},
 		},
 		{
@@ -324,7 +323,7 @@ func BuildFirewallZBFTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "PUT", fmt.Sprintf("%s/v1/sites/%s/firewall/policies/ordering", base, c.Site()), p.Config)
+				return c.DoIntegrationSite(ctx, "PUT", "/firewall/policies/ordering", p.Config)
 			},
 		},
 	}

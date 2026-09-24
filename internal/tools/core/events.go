@@ -14,7 +14,7 @@ func BuildEventTools(c *client.Client) []*BaseTool {
 
 	return []*BaseTool{
 		{
-			ToolName: "event_list", ToolDesc: "List recent events (newest first, max 3000)",
+			ToolName: "event_list", ToolDesc: "List recent events (Network below 9.0 only; newest first, max 3000)", RemovedVer: "9.0.0",
 			ToolCategory: permissions.CatEvents, ToolAction: permissions.ActionRead,
 			Schema: json.RawMessage(`{"type":"object","properties":{"within":{"type":"integer","description":"Hours of history (default 720)","default":720},"limit":{"type":"integer","description":"Max events (default 100)","default":100}}}`),
 			Client: c,

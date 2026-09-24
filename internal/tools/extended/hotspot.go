@@ -183,8 +183,7 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 			ToolCategory: permissions.CatHotspot, ToolAction: permissions.ActionRead, MinVer: "9.0.0",
 			Schema: core.NoInputSchema(), Client: c,
 			Handler: func(ctx context.Context, _ json.RawMessage) (json.RawMessage, error) {
-				base := c.Config().BaseURL() + "/integration"
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/hotspot/vouchers", base, c.Site()), nil)
+				return c.DoIntegrationSite(ctx, "GET", "/hotspot/vouchers", nil)
 			},
 		},
 		{
@@ -198,8 +197,7 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				base := c.Config().BaseURL() + "/integration"
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/hotspot/vouchers/%s", base, c.Site(), p.ID), nil)
+				return c.DoIntegrationSite(ctx, "GET", fmt.Sprintf("/hotspot/vouchers/%s", p.ID), nil)
 			},
 		},
 		{
@@ -214,8 +212,7 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				base := c.Config().BaseURL() + "/integration"
-				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/hotspot/vouchers", base, c.Site()), p.Config)
+				return c.DoIntegrationSite(ctx, "POST", "/hotspot/vouchers", p.Config)
 			},
 		},
 		{
@@ -229,8 +226,7 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				base := c.Config().BaseURL() + "/integration"
-				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/hotspot/vouchers/%s", base, c.Site(), p.ID), nil)
+				return c.DoIntegrationSite(ctx, "DELETE", fmt.Sprintf("/hotspot/vouchers/%s", p.ID), nil)
 			},
 		},
 		{
@@ -238,8 +234,7 @@ func BuildHotspotTools(c *client.Client) []*core.BaseTool {
 			ToolCategory: permissions.CatHotspot, ToolAction: permissions.ActionDelete, Mutating: true, MinVer: "9.0.0",
 			Schema: core.NoInputSchema(), Client: c,
 			Handler: func(ctx context.Context, _ json.RawMessage) (json.RawMessage, error) {
-				base := c.Config().BaseURL() + "/integration"
-				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/hotspot/vouchers", base, c.Site()), nil)
+				return c.DoIntegrationSite(ctx, "DELETE", "/hotspot/vouchers", nil)
 			},
 		},
 		{

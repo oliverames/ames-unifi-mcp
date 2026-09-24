@@ -648,7 +648,7 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/networks/%s/references", base, c.Site(), p.NetworkID), nil)
+				return c.DoIntegrationSite(ctx, "GET", fmt.Sprintf("/networks/%s/references", p.NetworkID), nil)
 			},
 		},
 		{
@@ -656,7 +656,7 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatDevices, ToolAction: permissions.ActionRead, MinVer: "9.0.0",
 			Schema: noInputSchema(), Client: c,
 			Handler: func(ctx context.Context, _ json.RawMessage) (json.RawMessage, error) {
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/device-tags", base, c.Site()), nil)
+				return c.DoIntegrationSite(ctx, "GET", "/device-tags", nil)
 			},
 		},
 		{
@@ -664,7 +664,7 @@ func BuildSystemTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatNetworks, ToolAction: permissions.ActionRead, MinVer: "9.0.0",
 			Schema: noInputSchema(), Client: c,
 			Handler: func(ctx context.Context, _ json.RawMessage) (json.RawMessage, error) {
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/radius/profiles", base, c.Site()), nil)
+				return c.DoIntegrationSite(ctx, "GET", "/radius/profiles", nil)
 			},
 		},
 	}

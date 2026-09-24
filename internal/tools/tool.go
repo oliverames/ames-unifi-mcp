@@ -44,6 +44,7 @@ type ToolMeta struct {
 	Category     permissions.Category `json:"category"`
 	Mutating     bool                 `json:"mutating"`
 	MinVersion   string               `json:"min_version,omitempty"`
+	RemovedIn    string               `json:"removed_in,omitempty"`
 	Undocumented bool                 `json:"undocumented,omitempty"`
 }
 
@@ -55,6 +56,7 @@ func MetaFromTool(t Tool) ToolMeta {
 		Category:     t.Category(),
 		Mutating:     t.IsMutating(),
 		MinVersion:   t.MinVersion(),
+		RemovedIn:    removedInVersion(t),
 		Undocumented: t.IsUndocumented(),
 	}
 }

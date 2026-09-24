@@ -10,7 +10,6 @@ import (
 )
 
 func BuildACLTools(c *client.Client) []*BaseTool {
-	base := c.Config().BaseURL() + "/integration"
 
 	return []*BaseTool{
 		{
@@ -18,7 +17,7 @@ func BuildACLTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatFirewall, ToolAction: permissions.ActionRead, MinVer: "10.0.0",
 			Schema: noInputSchema(), Client: c,
 			Handler: func(ctx context.Context, _ json.RawMessage) (json.RawMessage, error) {
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/acl-rules", base, c.Site()), nil)
+				return c.DoIntegrationSite(ctx, "GET", "/acl-rules", nil)
 			},
 		},
 		{
@@ -33,7 +32,7 @@ func BuildACLTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/acl-rules", base, c.Site()), p.Config)
+				return c.DoIntegrationSite(ctx, "POST", "/acl-rules", p.Config)
 			},
 		},
 		{
@@ -47,7 +46,7 @@ func BuildACLTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/acl-rules/%s", base, c.Site(), p.ID), nil)
+				return c.DoIntegrationSite(ctx, "GET", fmt.Sprintf("/acl-rules/%s", p.ID), nil)
 			},
 		},
 		{
@@ -63,7 +62,7 @@ func BuildACLTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "PUT", fmt.Sprintf("%s/v1/sites/%s/acl-rules/%s", base, c.Site(), p.ID), p.Config)
+				return c.DoIntegrationSite(ctx, "PUT", fmt.Sprintf("/acl-rules/%s", p.ID), p.Config)
 			},
 		},
 		{
@@ -77,7 +76,7 @@ func BuildACLTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/acl-rules/%s", base, c.Site(), p.ID), nil)
+				return c.DoIntegrationSite(ctx, "DELETE", fmt.Sprintf("/acl-rules/%s", p.ID), nil)
 			},
 		},
 		{
@@ -85,7 +84,7 @@ func BuildACLTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatFirewall, ToolAction: permissions.ActionRead, MinVer: "10.0.0",
 			Schema: noInputSchema(), Client: c,
 			Handler: func(ctx context.Context, _ json.RawMessage) (json.RawMessage, error) {
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/acl-rules/ordering", base, c.Site()), nil)
+				return c.DoIntegrationSite(ctx, "GET", "/acl-rules/ordering", nil)
 			},
 		},
 		{
@@ -100,7 +99,7 @@ func BuildACLTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "PUT", fmt.Sprintf("%s/v1/sites/%s/acl-rules/ordering", base, c.Site()), p.Config)
+				return c.DoIntegrationSite(ctx, "PUT", "/acl-rules/ordering", p.Config)
 			},
 		},
 	}

@@ -30,6 +30,7 @@ func (g *ConfirmGate) Category() permissions.Category { return g.inner.Category(
 func (g *ConfirmGate) Action() permissions.Action     { return g.inner.Action() }
 func (g *ConfirmGate) IsMutating() bool               { return true }
 func (g *ConfirmGate) MinVersion() string             { return g.inner.MinVersion() }
+func (g *ConfirmGate) RemovedInVersion() string       { return removedInVersion(g.inner) }
 func (g *ConfirmGate) IsUndocumented() bool           { return g.inner.IsUndocumented() }
 
 func (g *ConfirmGate) Description() string {

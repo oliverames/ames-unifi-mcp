@@ -10,7 +10,6 @@ import (
 )
 
 func BuildSwitchingTools(c *client.Client) []*BaseTool {
-	base := c.Config().BaseURL() + "/integration"
 
 	idConfigSchema := json.RawMessage(`{"type":"object","properties":{"id":{"type":"string"},"config":{"type":"object"}},"required":["id","config"]}`)
 	configSchema := json.RawMessage(`{"type":"object","properties":{"config":{"type":"object","description":"Configuration object"}},"required":["config"]}`)
@@ -22,7 +21,7 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatDevices, ToolAction: permissions.ActionRead, MinVer: "10.0.0",
 			Schema: noInputSchema(), Client: c,
 			Handler: func(ctx context.Context, _ json.RawMessage) (json.RawMessage, error) {
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/switching/switch-stacks", base, c.Site()), nil)
+				return c.DoIntegrationSite(ctx, "GET", "/switching/switch-stacks", nil)
 			},
 		},
 		{
@@ -36,7 +35,7 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/switching/switch-stacks/%s", base, c.Site(), p.ID), nil)
+				return c.DoIntegrationSite(ctx, "GET", fmt.Sprintf("/switching/switch-stacks/%s", p.ID), nil)
 			},
 		},
 		{
@@ -50,7 +49,7 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/switching/switch-stacks", base, c.Site()), p.Config)
+				return c.DoIntegrationSite(ctx, "POST", "/switching/switch-stacks", p.Config)
 			},
 		},
 		{
@@ -65,7 +64,7 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "PUT", fmt.Sprintf("%s/v1/sites/%s/switching/switch-stacks/%s", base, c.Site(), p.ID), p.Config)
+				return c.DoIntegrationSite(ctx, "PUT", fmt.Sprintf("/switching/switch-stacks/%s", p.ID), p.Config)
 			},
 		},
 		{
@@ -79,7 +78,7 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/switching/switch-stacks/%s", base, c.Site(), p.ID), nil)
+				return c.DoIntegrationSite(ctx, "DELETE", fmt.Sprintf("/switching/switch-stacks/%s", p.ID), nil)
 			},
 		},
 		// --- LAGs ---
@@ -88,7 +87,7 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatDevices, ToolAction: permissions.ActionRead, MinVer: "10.0.0",
 			Schema: noInputSchema(), Client: c,
 			Handler: func(ctx context.Context, _ json.RawMessage) (json.RawMessage, error) {
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/switching/lags", base, c.Site()), nil)
+				return c.DoIntegrationSite(ctx, "GET", "/switching/lags", nil)
 			},
 		},
 		{
@@ -102,7 +101,7 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/switching/lags/%s", base, c.Site(), p.ID), nil)
+				return c.DoIntegrationSite(ctx, "GET", fmt.Sprintf("/switching/lags/%s", p.ID), nil)
 			},
 		},
 		{
@@ -116,7 +115,7 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/switching/lags", base, c.Site()), p.Config)
+				return c.DoIntegrationSite(ctx, "POST", "/switching/lags", p.Config)
 			},
 		},
 		{
@@ -131,7 +130,7 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "PUT", fmt.Sprintf("%s/v1/sites/%s/switching/lags/%s", base, c.Site(), p.ID), p.Config)
+				return c.DoIntegrationSite(ctx, "PUT", fmt.Sprintf("/switching/lags/%s", p.ID), p.Config)
 			},
 		},
 		{
@@ -145,7 +144,7 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/switching/lags/%s", base, c.Site(), p.ID), nil)
+				return c.DoIntegrationSite(ctx, "DELETE", fmt.Sprintf("/switching/lags/%s", p.ID), nil)
 			},
 		},
 		// --- MC-LAGs ---
@@ -154,7 +153,7 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatDevices, ToolAction: permissions.ActionRead, MinVer: "10.0.0",
 			Schema: noInputSchema(), Client: c,
 			Handler: func(ctx context.Context, _ json.RawMessage) (json.RawMessage, error) {
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/switching/mc-lag-domains", base, c.Site()), nil)
+				return c.DoIntegrationSite(ctx, "GET", "/switching/mc-lag-domains", nil)
 			},
 		},
 		{
@@ -168,7 +167,7 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/switching/mc-lag-domains/%s", base, c.Site(), p.ID), nil)
+				return c.DoIntegrationSite(ctx, "GET", fmt.Sprintf("/switching/mc-lag-domains/%s", p.ID), nil)
 			},
 		},
 		{
@@ -182,7 +181,7 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/switching/mc-lag-domains", base, c.Site()), p.Config)
+				return c.DoIntegrationSite(ctx, "POST", "/switching/mc-lag-domains", p.Config)
 			},
 		},
 		{
@@ -197,7 +196,7 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "PUT", fmt.Sprintf("%s/v1/sites/%s/switching/mc-lag-domains/%s", base, c.Site(), p.ID), p.Config)
+				return c.DoIntegrationSite(ctx, "PUT", fmt.Sprintf("/switching/mc-lag-domains/%s", p.ID), p.Config)
 			},
 		},
 		{
@@ -211,7 +210,7 @@ func BuildSwitchingTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/switching/mc-lag-domains/%s", base, c.Site(), p.ID), nil)
+				return c.DoIntegrationSite(ctx, "DELETE", fmt.Sprintf("/switching/mc-lag-domains/%s", p.ID), nil)
 			},
 		},
 	}

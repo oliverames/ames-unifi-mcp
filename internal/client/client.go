@@ -19,15 +19,21 @@ import (
 
 const maxResponseBodyBytes int64 = 10 << 20
 
+const authCooldown = 30 * time.Second
+
 // Client handles HTTP communication with the UniFi controller.
 // Targets UniFi OS (Dream Machine) — always uses /proxy/network prefix.
 type Client struct {
-	cfg        *config.Config
-	httpClient *http.Client
-	mu         sync.RWMutex // protects csrfToken and loginGen
-	csrfToken  string
-	loginGen   uint64     // incremented on each successful login; used to coalesce concurrent re-logins
-	loginMu    sync.Mutex // serializes re-login attempts
+	cfg               *config.Config
+	httpClient        *http.Client
+	mu                sync.RWMutex // protects csrfToken and loginGen
+	csrfToken         string
+	loginGen          uint64     // incremented on each successful login; used to coalesce concurrent re-logins
+	loginMu           sync.Mutex // serializes re-login attempts
+	lastAuthSuccess   time.Time  // protected by mu
+	reloginAfter      time.Time  // protected by loginMu
+	siteMu            sync.Mutex
+	integrationSiteID string
 }
 
 // LegacyResponse is the envelope for legacy API responses.
@@ -113,6 +119,7 @@ func (c *Client) login(ctx context.Context) error {
 	if token := resp.Header.Get("X-Csrf-Token"); token != "" {
 		c.csrfToken = token
 	}
+	c.lastAuthSuccess = time.Now()
 	c.loginGen++
 	c.mu.Unlock()
 
@@ -224,6 +231,9 @@ func (c *Client) Do(ctx context.Context, method, path string, payload interface{
 // DoRaw executes a request and returns the raw response body without envelope parsing.
 // Use for Integration API or v2 endpoints. Handles 401 re-login for session auth.
 func (c *Client) DoRaw(ctx context.Context, method, fullURL string, payload interface{}) (json.RawMessage, error) {
+	if strings.HasPrefix(fullURL, c.cfg.BaseURL()+"/integration/") && c.cfg.AuthMethod() != config.AuthAPIKey {
+		return nil, fmt.Errorf("integration API requires UNIFI_API_KEY; username/password sessions are not supported")
+	}
 	var bodyBytes []byte
 	if payload != nil {
 		data, err := json.Marshal(payload)
@@ -312,12 +322,21 @@ func (c *Client) reloginIfNeeded(ctx context.Context, genBefore uint64) error {
 	// Check if another goroutine already refreshed
 	c.mu.RLock()
 	currentGen := c.loginGen
+	lastSuccess := c.lastAuthSuccess
 	c.mu.RUnlock()
 
 	if currentGen != genBefore {
 		return nil // another goroutine already re-logged in
 	}
 
+	if time.Since(lastSuccess) < authCooldown {
+		return fmt.Errorf("endpoint rejected a recently authenticated session; re-login suppressed for 30 seconds")
+	}
+	if time.Now().Before(c.reloginAfter) {
+		return fmt.Errorf("authentication retry is cooling down; wait 30 seconds before retrying")
+	}
+	// Latch before login so failures also suppress subsequent attempts.
+	c.reloginAfter = time.Now().Add(authCooldown)
 	return c.login(ctx)
 }
 

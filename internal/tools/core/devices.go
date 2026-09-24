@@ -148,8 +148,7 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatDevices, ToolAction: permissions.ActionRead, MinVer: "9.0.0",
 			Schema: noInputSchema(), Client: c,
 			Handler: func(ctx context.Context, _ json.RawMessage) (json.RawMessage, error) {
-				base := c.Config().BaseURL() + "/integration"
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/devices", base, c.Site()), nil)
+				return c.DoIntegrationSite(ctx, "GET", "/devices", nil)
 			},
 		},
 		{
@@ -170,8 +169,7 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				base := c.Config().BaseURL() + "/integration"
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/devices/%s", base, c.Site(), p.DeviceID), nil)
+				return c.DoIntegrationSite(ctx, "GET", fmt.Sprintf("/devices/%s", p.DeviceID), nil)
 			},
 		},
 		{
@@ -192,8 +190,7 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				base := c.Config().BaseURL() + "/integration"
-				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/devices", base, c.Site()), p.Config)
+				return c.DoIntegrationSite(ctx, "POST", "/devices", p.Config)
 			},
 		},
 		{
@@ -216,8 +213,7 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				base := c.Config().BaseURL() + "/integration"
-				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/devices/%s/actions", base, c.Site(), p.DeviceID), p.Config)
+				return c.DoIntegrationSite(ctx, "POST", fmt.Sprintf("/devices/%s/actions", p.DeviceID), p.Config)
 			},
 		},
 		{
@@ -247,8 +243,7 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				base := c.Config().BaseURL() + "/integration"
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/devices/%s/statistics/latest", base, c.Site(), p.DeviceID), nil)
+				return c.DoIntegrationSite(ctx, "GET", fmt.Sprintf("/devices/%s/statistics/latest", p.DeviceID), nil)
 			},
 		},
 		{
@@ -269,8 +264,7 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				base := c.Config().BaseURL() + "/integration"
-				return c.DoRaw(ctx, "DELETE", fmt.Sprintf("%s/v1/sites/%s/devices/%s", base, c.Site(), p.DeviceID), nil)
+				return c.DoIntegrationSite(ctx, "DELETE", fmt.Sprintf("/devices/%s", p.DeviceID), nil)
 			},
 		},
 		{
@@ -295,8 +289,7 @@ func BuildDeviceTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				base := c.Config().BaseURL() + "/integration"
-				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/devices/%s/interfaces/ports/%d/actions", base, c.Site(), p.DeviceID, p.PortIdx), p.Config)
+				return c.DoIntegrationSite(ctx, "POST", fmt.Sprintf("/devices/%s/interfaces/ports/%d/actions", p.DeviceID, p.PortIdx), p.Config)
 			},
 		},
 		// --- Legacy API tools ---

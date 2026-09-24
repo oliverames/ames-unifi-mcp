@@ -22,6 +22,7 @@ type BaseTool struct {
 	Schema       json.RawMessage
 	Mutating     bool
 	MinVer       string
+	RemovedVer   string
 	Undocumented bool
 	Client       *client.Client
 	Handler      HandlerFunc
@@ -34,6 +35,7 @@ func (b *BaseTool) Action() permissions.Action     { return b.ToolAction }
 func (b *BaseTool) InputSchema() json.RawMessage   { return b.Schema }
 func (b *BaseTool) IsMutating() bool               { return b.Mutating }
 func (b *BaseTool) MinVersion() string             { return b.MinVer }
+func (b *BaseTool) RemovedInVersion() string       { return b.RemovedVer }
 func (b *BaseTool) IsUndocumented() bool           { return b.Undocumented }
 
 func (b *BaseTool) Execute(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {

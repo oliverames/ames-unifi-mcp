@@ -762,3 +762,25 @@ Paginated: adds `"nextToken": "..."`. Error: `{"code": "ERROR_CODE", "httpStatus
 
 ### Cloud API
 Same as Integration API format with pagination via `pageSize` + `nextToken` query params.
+
+## September 24, 2026 compatibility corrections
+
+Official Network 10.1.84 [List Local Sites](https://developer.ui.com/network/v10.1.84/getsiteoverviewpage)
+and its [OpenAPI schema](https://developer.ui.com/network/v10.1.84/openapi.json)
+define `id` as a UUID and `internalReference` as the legacy site name. The
+client now resolves `UNIFI_SITE` against `internalReference`, follows offset
+pagination and caches the UUID independently. Integration API requests require
+`UNIFI_API_KEY`; legacy site names and session credentials retain their roles.
+
+Session refresh attempts are serialized and limited to one per 30 seconds,
+including failed attempts. A login within the previous 30 seconds suppresses
+another refresh on a permanent 401. An expired session can refresh after that
+window. `misc_self` uses the Network application's `api/self` resource.
+
+Issue #11 records a live `stat/event` 404 on Network 10.4.57 and its removal in
+the Network 9/10 generation. `event_list` now reports an explicit compatibility
+error from Network 9.0.0 onward. The gate is covered at versions 8, 9 and 10;
+unknown versions retain the legacy request. The suspected `cnt/alarm`,
+`rest/event` and `list/alarm` removals are not confirmed and are not gated.
+No real controller was queried during this source change. Those three probes
+and receiving-host acceptance remain in issue #11.

@@ -56,6 +56,17 @@ func (r *Registry) Register(t Tool) error {
 		return nil
 	}
 
+	// Keep a discoverable compatibility error for removed tools, including eager mode.
+	if removed := removedInVersion(t); removed != "" {
+		boundary, err := version.Parse(removed)
+		if err != nil {
+			return fmt.Errorf("%s: invalid removal version: %w", t.Name(), err)
+		}
+		if r.version.AtLeast(boundary.Major, boundary.Minor, boundary.Patch) {
+			t = &unavailableTool{Tool: t, reason: fmt.Sprintf("%s is not available on UniFi Network >=%s (detected %d.%d.%d)", t.Name(), removed, r.version.Major, r.version.Minor, r.version.Patch), removed: removed}
+		}
+	}
+
 	// Wrap mutating tools with confirm gate
 	wrapped := WithConfirm(t)
 
@@ -146,3 +157,25 @@ type BatchResult struct {
 	Data  json.RawMessage `json:"data,omitempty"`
 	Error string          `json:"error,omitempty"`
 }
+
+// Optional interface preserves compatibility with external Tool implementations.
+func removedInVersion(t Tool) string {
+	if v, ok := t.(interface{ RemovedInVersion() string }); ok {
+		return v.RemovedInVersion()
+	}
+	return ""
+}
+
+type unavailableTool struct {
+	Tool
+	reason  string
+	removed string
+}
+
+func (t *unavailableTool) Execute(context.Context, json.RawMessage) (json.RawMessage, error) {
+	return nil, fmt.Errorf("%s", t.reason)
+}
+func (t *unavailableTool) Description() string {
+	return t.Tool.Description() + " [UNAVAILABLE: " + t.reason + "]"
+}
+func (t *unavailableTool) RemovedInVersion() string { return t.removed }

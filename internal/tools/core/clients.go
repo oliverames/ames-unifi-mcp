@@ -190,8 +190,7 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 			ToolCategory: permissions.CatClients, ToolAction: permissions.ActionRead, MinVer: "9.0.0",
 			Schema: noInputSchema(), Client: c,
 			Handler: func(ctx context.Context, _ json.RawMessage) (json.RawMessage, error) {
-				base := c.Config().BaseURL() + "/integration"
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/clients", base, c.Site()), nil)
+				return c.DoIntegrationSite(ctx, "GET", "/clients", nil)
 			},
 		},
 		{
@@ -212,8 +211,7 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				base := c.Config().BaseURL() + "/integration"
-				return c.DoRaw(ctx, "GET", fmt.Sprintf("%s/v1/sites/%s/clients/%s", base, c.Site(), p.ClientID), nil)
+				return c.DoIntegrationSite(ctx, "GET", fmt.Sprintf("/clients/%s", p.ClientID), nil)
 			},
 		},
 		{
@@ -236,8 +234,7 @@ func BuildClientTools(c *client.Client) []*BaseTool {
 				if err := json.Unmarshal(input, &p); err != nil {
 					return nil, fmt.Errorf("parsing input: %w", err)
 				}
-				base := c.Config().BaseURL() + "/integration"
-				return c.DoRaw(ctx, "POST", fmt.Sprintf("%s/v1/sites/%s/clients/%s/actions", base, c.Site(), p.ClientID), p.Config)
+				return c.DoIntegrationSite(ctx, "POST", fmt.Sprintf("/clients/%s/actions", p.ClientID), p.Config)
 			},
 		},
 		{

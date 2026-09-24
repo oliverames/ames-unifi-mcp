@@ -360,7 +360,7 @@ func BuildMiscTools(c *client.Client) []*core.BaseTool {
 			ToolCategory: permissions.CatSystem, ToolAction: permissions.ActionRead,
 			Schema: core.NoInputSchema(), Client: c,
 			Handler: func(ctx context.Context, _ json.RawMessage) (json.RawMessage, error) {
-				return c.Do(ctx, "GET", "api/users/self", nil)
+				return c.Do(ctx, "GET", "api/self", nil)
 			},
 		},
 		{

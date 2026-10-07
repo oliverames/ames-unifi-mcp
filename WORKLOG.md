@@ -2,7 +2,7 @@
 
 ## 2026-10-07 - GitHub Issue Review Closeout
 
-**What changed**: Reviewed all 1 open issues against source at `745ee915ec4d` and their complete issue history. No issue qualified for closure.
+**What changed**: Reviewed the one open issue against source at `745ee915ec4d` and their complete issue history. No issue qualified for closure.
 
 **Decisions made**: Close completed implementations even when device acceptance remains, and close testing-only tasks under Oliver's explicit instruction. Keep unresolved defects, missing implementation, release work, and owner decisions open.
 

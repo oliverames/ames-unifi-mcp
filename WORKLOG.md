@@ -1,5 +1,13 @@
 # Worklog
 
+## 2026-10-23 - Security review
+
+`9c7a76f` closes a permission-profile bypass. Tools splice caller-supplied keys into controller paths, and input validation checks path syntax only for `id`, `*_id` and MAC fields. A key such as `../../cmd/devmgr` on `system_setting_update`, which the standard profile allows, reached command endpoints that profile denies once the console normalized the path, and deeper traversal reached UniFi OS endpoints. The client now refuses any request whose decoded path has a `.` or `..` segment. The same commit holds redirects to the host allowlist, because net/http forwards `X-API-Key` and `X-Csrf-Token` to any redirect target. `2b6d5f0` removes `install.js`, a postinstall script that package.json no longer runs or ships.
+
+Verification with Go 1.26.10: gofmt, race tests, vet, staticcheck 2026.1, govulncheck 1.6.0 (no vulnerabilities found), the Node syntax checks and all four platform builds passed. New tests fail on the old client. No controller calls ran. Published 1.0.8 binaries keep the old behavior until the next release. Open review items: cloud tools send `UNIFI_API_KEY` to `api.ui.com`, and their `pageSize`, `nextToken` and `type` inputs are concatenated into the URL unescaped.
+
+---
+
 ## 2026-10-23 - Release 1.0.8
 
 Tagged `v1.0.8` at `41ea81b`. The first release run published the GitHub release, then npm rejected the publish with a 404 because the `NPM_TOKEN` secret still held the July 13 token. The secret now holds the 1Password `npm Publish Token`, and a rerun of the failed job published npm with provenance.

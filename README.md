@@ -18,7 +18,7 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/ames-unifi-mcp"><img src="https://img.shields.io/npm/v/ames-unifi-mcp?style=flat-square&color=f5a542" alt="npm"></a>
   <a href="https://github.com/oliverames/ames-unifi-mcp/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/oliverames/ames-unifi-mcp/ci.yml?branch=main&style=flat-square&label=CI&color=f5a542" alt="CI"></a>
-  <a href="https://github.com/oliverames/ames-unifi-mcp/releases/tag/v1.0.7"><img src="https://img.shields.io/github/v/release/oliverames/ames-unifi-mcp?style=flat-square&color=f5a542&label=MCPB" alt="MCPB release"></a>
+  <a href="https://github.com/oliverames/ames-unifi-mcp/releases/tag/v1.0.8"><img src="https://img.shields.io/github/v/release/oliverames/ames-unifi-mcp?style=flat-square&color=f5a542&label=MCPB" alt="MCPB release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-f5a542?style=flat-square" alt="License"></a>
   <a href="https://www.buymeacoffee.com/oliverames"><img src="https://img.shields.io/badge/Buy_Me_a_Coffee-support-f5a542?style=flat-square&logo=buy-me-a-coffee&logoColor=white" alt="Buy Me a Coffee"></a>
 </p>
@@ -45,9 +45,9 @@ Every mutating operation passes through a **confirm gate** that returns a dry-ru
 
 ### Install with MCPB
 
-For Claude Desktop and other MCPB-compatible clients, download the local bundle from the [v1.0.7 release](https://github.com/oliverames/ames-unifi-mcp/releases/tag/v1.0.7):
+For Claude Desktop and other MCPB-compatible clients, download the local bundle from the [v1.0.8 release](https://github.com/oliverames/ames-unifi-mcp/releases/tag/v1.0.8):
 
-[Download `ames-unifi-mcp-1.0.7.mcpb`](https://github.com/oliverames/ames-unifi-mcp/releases/download/v1.0.7/ames-unifi-mcp-1.0.7.mcpb)
+[Download `ames-unifi-mcp-1.0.8.mcpb`](https://github.com/oliverames/ames-unifi-mcp/releases/download/v1.0.8/ames-unifi-mcp-1.0.8.mcpb)
 
 The bundle includes the UniFi favicon, production runtime binaries for macOS and Linux, and setup prompts for host, authentication, site, SSL, tool mode, and permission profile.
 

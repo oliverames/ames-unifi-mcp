@@ -1,5 +1,13 @@
 # Worklog
 
+## 2026-10-23 - Patched Go 1.26.10 toolchain and x/text
+
+Raised the minimum/CI Go version, CONTRIBUTING toolchain, and Docker builder from 1.26.8 to 1.26.10. OSV lists 14 standard library advisories against 1.26.8 (GO-2026-6599 through GO-2026-6617 and GO-2026-6809) and none against 1.26.10. The Docker builder compiled release images with the affected standard library. Updated golang.org/x/text from v0.14.0 to v0.41.0 for GO-2026-5970 and GO-2026-6629, which this code did not call.
+
+Verification with Go 1.26.10 passed: gofmt, race tests, vet, staticcheck 2026.1, govulncheck 1.6.0 (no vulnerabilities found, including module-level), the Node syntax checks, and all four platform builds. Docker image construction was not tested. Published binaries and images keep the old toolchain until the next release.
+
+---
+
 ## 2026-10-07 - GitHub Issue Review Closeout
 
 **What changed**: Reviewed the one open issue against source at `745ee915ec4d` and their complete issue history. No issue qualified for closure.

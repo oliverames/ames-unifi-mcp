@@ -7,6 +7,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/oliverames/ames-unifi-mcp/internal/errorreport"
 	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
 	"github.com/oliverames/ames-unifi-mcp/internal/version"
 )
@@ -112,12 +113,15 @@ func (r *Registry) All() map[string]Tool {
 	return out
 }
 
-// Execute dispatches a tool call by name.
-func (r *Registry) Execute(ctx context.Context, name string, input json.RawMessage) (json.RawMessage, error) {
+// Execute dispatches a tool call by name. A panic inside the tool is
+// recovered, reported with the tool name only, and returned as an error, so
+// it cannot crash the server (tool_batch runs tools in their own goroutines).
+func (r *Registry) Execute(ctx context.Context, name string, input json.RawMessage) (data json.RawMessage, err error) {
 	t, ok := r.Get(name)
 	if !ok {
 		return nil, fmt.Errorf("unknown tool: %s", name)
 	}
+	defer errorreport.RecoverTool(name, &err)
 	return t.Execute(ctx, input)
 }
 

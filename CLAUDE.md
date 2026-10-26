@@ -44,6 +44,7 @@ internal/
 | `UNIFI_VERIFY_SSL` | No | `true` | `false` for self-signed certs |
 | `UNIFI_TOOL_MODE` | No | `lazy` | `lazy` (3 meta-tools) or `eager` (all 310) |
 | `UNIFI_PERMISSION_PROFILE` | No | `standard` | `read-only`, `standard`, or `admin` |
+| `SENTRY_DSN` | No | — | Optional. Enables scrubbed panic reports (`internal/errorreport`). Unset means no Sentry code runs |
 
 \* `UNIFI_HOST` plus either `UNIFI_API_KEY` or `UNIFI_USERNAME`+`UNIFI_PASSWORD` are needed to actually call the controller. If absent, `config.Load()` sets `cfg.NeedsAuth = true` instead of hard-failing. The server starts, registers tools, and every tool dispatch in `cmd/ames-unifi-mcp/main.go` short-circuits with `cfg.AuthHint()`. The plugin appears installed but inactive instead of erroring at startup. The same behavior applies when caller-supplied 1Password references return nothing.
 

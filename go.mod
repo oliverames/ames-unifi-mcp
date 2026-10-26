@@ -2,7 +2,12 @@ module github.com/oliverames/ames-unifi-mcp
 
 go 1.26.10
 
-require github.com/mark3labs/mcp-go v1.1.1
+require (
+	github.com/getsentry/sentry-go v0.50.0
+	github.com/mark3labs/mcp-go v1.1.1
+)
+
+require golang.org/x/sys v0.47.0 // indirect
 
 require (
 	github.com/google/jsonschema-go v0.4.2 // indirect

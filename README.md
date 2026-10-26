@@ -297,6 +297,7 @@ The server covers all three UniFi API layers:
 | `UNIFI_VERIFY_SSL` | No | `true` | `false` for self-signed certs |
 | `UNIFI_TOOL_MODE` | No | `lazy` | `lazy` (3 meta-tools) or `eager` (all 310 tools) |
 | `UNIFI_PERMISSION_PROFILE` | No | `standard` | `read-only`, `standard`, or `admin` |
+| `SENTRY_DSN` | No | empty | Optional Sentry DSN. When set, panics in tool handlers are reported with only the tool name and panic type. See [Error reporting](#error-reporting) |
 
 <sub>* `UNIFI_HOST` plus either `UNIFI_API_KEY` or both `UNIFI_USERNAME` + `UNIFI_PASSWORD` are required for the server to actually call the controller. If they are absent, the server still starts and registers all tools (so the plugin appears installed), but every tool call returns a structured "credentials not configured" error pointing the user at the env vars or 1Password fallback. This lets the connector live in a clean "needs authentication" state instead of a hard startup error.</sub>
 
@@ -316,6 +317,12 @@ Plaintext environment variables take priority. The server calls `op read` only w
 **API Key** (recommended) &mdash; Generate at Settings &rarr; Control Plane &rarr; Integrations. Supports both legacy and Integration API endpoints. No session management overhead.
 
 **Username/Password** &mdash; Uses session cookies with automatic re-login on expiry. The server includes a single-flight re-login mechanism that prevents thundering-herd issues when batch operations encounter session timeouts simultaneously.
+
+### Error reporting
+
+Error reporting is off by default. Set `SENTRY_DSN` to send reports to a Sentry project you control. The package ships with no DSN, so nothing is sent unless you configure one.
+
+When it is on, the server reports only panics recovered inside tool handlers. A panicking tool returns an error result instead of stopping the server. Each report holds the tool name, the Go type of the panic, a fixed message, and stack frames reduced to package paths and file names. Panic values, error text, tool arguments, and controller responses are never attached, because they can contain device names, MAC and IP addresses, SSIDs, client hostnames, and credentials. Request data, user data, the machine's hostname, breadcrumbs, and tracing are turned off or stripped before an event leaves the process.
 
 See [integration testing](docs/INTEGRATION_TESTING.md) for a safe controller test sequence and [release guidance](docs/RELEASING.md) for the checks that produce the npm package, MCPB bundle, checksums, and SBOM.
 

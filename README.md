@@ -18,7 +18,7 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/ames-unifi-mcp"><img src="https://img.shields.io/npm/v/ames-unifi-mcp?style=flat-square&color=f5a542" alt="npm"></a>
   <a href="https://github.com/oliverames/ames-unifi-mcp/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/oliverames/ames-unifi-mcp/ci.yml?branch=main&style=flat-square&label=CI&color=f5a542" alt="CI"></a>
-  <a href="https://github.com/oliverames/ames-unifi-mcp/releases/tag/v1.0.7"><img src="https://img.shields.io/github/v/release/oliverames/ames-unifi-mcp?style=flat-square&color=f5a542&label=MCPB" alt="MCPB release"></a>
+  <a href="https://github.com/oliverames/ames-unifi-mcp/releases/tag/v1.0.8"><img src="https://img.shields.io/github/v/release/oliverames/ames-unifi-mcp?style=flat-square&color=f5a542&label=MCPB" alt="MCPB release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-f5a542?style=flat-square" alt="License"></a>
   <a href="https://www.buymeacoffee.com/oliverames"><img src="https://img.shields.io/badge/Buy_Me_a_Coffee-support-f5a542?style=flat-square&logo=buy-me-a-coffee&logoColor=white" alt="Buy Me a Coffee"></a>
 </p>
@@ -45,9 +45,9 @@ Every mutating operation passes through a **confirm gate** that returns a dry-ru
 
 ### Install with MCPB
 
-For Claude Desktop and other MCPB-compatible clients, download the local bundle from the [v1.0.7 release](https://github.com/oliverames/ames-unifi-mcp/releases/tag/v1.0.7):
+For Claude Desktop and other MCPB-compatible clients, download the local bundle from the [v1.0.8 release](https://github.com/oliverames/ames-unifi-mcp/releases/tag/v1.0.8):
 
-[Download `ames-unifi-mcp-1.0.7.mcpb`](https://github.com/oliverames/ames-unifi-mcp/releases/download/v1.0.7/ames-unifi-mcp-1.0.7.mcpb)
+[Download `ames-unifi-mcp-1.0.8.mcpb`](https://github.com/oliverames/ames-unifi-mcp/releases/download/v1.0.8/ames-unifi-mcp-1.0.8.mcpb)
 
 The bundle includes the UniFi favicon, production runtime binaries for macOS and Linux, and setup prompts for host, authentication, site, SSL, tool mode, and permission profile.
 
@@ -297,6 +297,7 @@ The server covers all three UniFi API layers:
 | `UNIFI_VERIFY_SSL` | No | `true` | `false` for self-signed certs |
 | `UNIFI_TOOL_MODE` | No | `lazy` | `lazy` (3 meta-tools) or `eager` (all 310 tools) |
 | `UNIFI_PERMISSION_PROFILE` | No | `standard` | `read-only`, `standard`, or `admin` |
+| `SENTRY_DSN` | No | empty | Optional Sentry DSN. When set, panics in tool handlers are reported with only the tool name and panic type. See [Error reporting](#error-reporting) |
 
 <sub>* `UNIFI_HOST` plus either `UNIFI_API_KEY` or both `UNIFI_USERNAME` + `UNIFI_PASSWORD` are required for the server to actually call the controller. If they are absent, the server still starts and registers all tools (so the plugin appears installed), but every tool call returns a structured "credentials not configured" error pointing the user at the env vars or 1Password fallback. This lets the connector live in a clean "needs authentication" state instead of a hard startup error.</sub>
 
@@ -316,6 +317,12 @@ Plaintext environment variables take priority. The server calls `op read` only w
 **API Key** (recommended) &mdash; Generate at Settings &rarr; Control Plane &rarr; Integrations. Supports both legacy and Integration API endpoints. No session management overhead.
 
 **Username/Password** &mdash; Uses session cookies with automatic re-login on expiry. The server includes a single-flight re-login mechanism that prevents thundering-herd issues when batch operations encounter session timeouts simultaneously.
+
+### Error reporting
+
+Error reporting is off by default. Set `SENTRY_DSN` to send reports to a Sentry project you control. The package ships with no DSN, so nothing is sent unless you configure one.
+
+When it is on, the server reports only panics recovered inside tool handlers. A panicking tool returns an error result instead of stopping the server. Each report holds the tool name, the Go type of the panic, a fixed message, and stack frames reduced to package paths and file names. Panic values, error text, tool arguments, and controller responses are never attached, because they can contain device names, MAC and IP addresses, SSIDs, client hostnames, and credentials. Request data, user data, the machine's hostname, breadcrumbs, and tracing are turned off or stripped before an event leaves the process.
 
 See [integration testing](docs/INTEGRATION_TESTING.md) for a safe controller test sequence and [release guidance](docs/RELEASING.md) for the checks that produce the npm package, MCPB bundle, checksums, and SBOM.
 

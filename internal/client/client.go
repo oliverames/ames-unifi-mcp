@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -66,6 +67,15 @@ func New(cfg *config.Config) (*Client, error) {
 	c := &Client{
 		cfg:        cfg,
 		httpClient: httpClient,
+	}
+	// net/http forwards custom headers such as X-API-Key and X-Csrf-Token to
+	// any redirect target, so every hop must pass the same host check as the
+	// original request.
+	httpClient.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		if len(via) >= 10 {
+			return errors.New("stopped after 10 redirects")
+		}
+		return c.validateRequestURL(req.URL)
 	}
 
 	// If unauthenticated (no creds), skip login. The server starts in a
@@ -415,6 +425,14 @@ func (c *Client) validateRequestURL(u *url.URL) error {
 	}
 	if u.Scheme != "http" && u.Scheme != "https" {
 		return fmt.Errorf("refusing request with unsupported URL scheme %q", u.Scheme)
+	}
+	// Tools splice caller-supplied keys into paths. Once the console normalizes
+	// a dot segment, a tool the permission profile allows could reach another
+	// Network or UniFi OS endpoint with this session's credentials.
+	for _, segment := range strings.Split(u.Path, "/") {
+		if segment == "." || segment == ".." {
+			return fmt.Errorf("refusing request with a dot segment in path %q", u.Path)
+		}
 	}
 
 	hostURL, err := url.Parse(c.cfg.Host)

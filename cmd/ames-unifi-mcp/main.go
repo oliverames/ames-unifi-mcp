@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
@@ -13,6 +14,7 @@ import (
 	"github.com/oliverames/ames-unifi-mcp/internal/buildinfo"
 	"github.com/oliverames/ames-unifi-mcp/internal/client"
 	"github.com/oliverames/ames-unifi-mcp/internal/config"
+	"github.com/oliverames/ames-unifi-mcp/internal/errorreport"
 	"github.com/oliverames/ames-unifi-mcp/internal/permissions"
 	"github.com/oliverames/ames-unifi-mcp/internal/tools"
 	"github.com/oliverames/ames-unifi-mcp/internal/tools/core"
@@ -21,6 +23,9 @@ import (
 )
 
 func main() {
+	// Optional, scrubbed panic reporting. Off unless SENTRY_DSN is set.
+	errorreport.Init(os.Getenv("SENTRY_DSN"), "ames-unifi-mcp@"+buildinfo.Version)
+
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalf("config: %v", err)
@@ -73,9 +78,25 @@ func main() {
 	}
 
 	// Run stdio transport
-	if err := server.ServeStdio(s); err != nil {
+	err = server.ServeStdio(s)
+	errorreport.Flush(2 * time.Second)
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "server error: %v\n", err)
 		os.Exit(1)
+	}
+}
+
+// recoverHandler wraps a tool handler so a panic is reported (tool name and
+// panic type only) and returned as a tool error instead of crashing the server.
+func recoverHandler(name string, h server.ToolHandlerFunc) server.ToolHandlerFunc {
+	return func(ctx context.Context, req mcp.CallToolRequest) (result *mcp.CallToolResult, err error) {
+		defer func() {
+			if v := recover(); v != nil {
+				errorreport.CapturePanic(name, v)
+				result, err = mcp.NewToolResultError(fmt.Sprintf("internal error in tool %s", errorreport.SafeToolName(name))), nil
+			}
+		}()
+		return h(ctx, req)
 	}
 }
 
@@ -121,7 +142,7 @@ func registerLazyTools(s *server.MCPServer, registry *tools.Registry, cfg *confi
 		Name:        indexTool.Name(),
 		Description: indexTool.Description(),
 		InputSchema: rawToSchema(indexTool.InputSchema()),
-	}, func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	}, recoverHandler(indexTool.Name(), func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		if cfg.NeedsAuth {
 			return authGate(cfg), nil
 		}
@@ -134,7 +155,7 @@ func registerLazyTools(s *server.MCPServer, registry *tools.Registry, cfg *confi
 			return mcp.NewToolResultError(err.Error()), nil
 		}
 		return mcp.NewToolResultText(string(data)), nil
-	})
+	}))
 
 	// tool_execute
 	execTool := tools.NewMetaToolExecute(registry)
@@ -142,7 +163,7 @@ func registerLazyTools(s *server.MCPServer, registry *tools.Registry, cfg *confi
 		Name:        execTool.Name(),
 		Description: execTool.Description(),
 		InputSchema: rawToSchema(execTool.InputSchema()),
-	}, func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	}, recoverHandler(execTool.Name(), func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		if cfg.NeedsAuth {
 			return authGate(cfg), nil
 		}
@@ -155,7 +176,7 @@ func registerLazyTools(s *server.MCPServer, registry *tools.Registry, cfg *confi
 			return mcp.NewToolResultError(err.Error()), nil
 		}
 		return mcp.NewToolResultText(string(data)), nil
-	})
+	}))
 
 	// tool_batch
 	batchTool := tools.NewMetaToolBatch(registry)
@@ -163,7 +184,7 @@ func registerLazyTools(s *server.MCPServer, registry *tools.Registry, cfg *confi
 		Name:        batchTool.Name(),
 		Description: batchTool.Description(),
 		InputSchema: rawToSchema(batchTool.InputSchema()),
-	}, func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	}, recoverHandler(batchTool.Name(), func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		if cfg.NeedsAuth {
 			return authGate(cfg), nil
 		}
@@ -176,7 +197,7 @@ func registerLazyTools(s *server.MCPServer, registry *tools.Registry, cfg *confi
 			return mcp.NewToolResultError(err.Error()), nil
 		}
 		return mcp.NewToolResultText(string(data)), nil
-	})
+	}))
 }
 
 func registerEagerTools(s *server.MCPServer, registry *tools.Registry, cfg *config.Config) {
@@ -186,7 +207,7 @@ func registerEagerTools(s *server.MCPServer, registry *tools.Registry, cfg *conf
 			Name:        tool.Name(),
 			Description: tool.Description(),
 			InputSchema: rawToSchema(tool.InputSchema()),
-		}, func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		}, recoverHandler(tool.Name(), func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 			if cfg.NeedsAuth {
 				return authGate(cfg), nil
 			}
@@ -199,7 +220,7 @@ func registerEagerTools(s *server.MCPServer, registry *tools.Registry, cfg *conf
 				return mcp.NewToolResultError(err.Error()), nil
 			}
 			return mcp.NewToolResultText(string(data)), nil
-		})
+		}))
 	}
 }
 

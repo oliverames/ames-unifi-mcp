@@ -4,7 +4,7 @@ go 1.26.10
 
 require (
 	github.com/getsentry/sentry-go v0.50.0
-	github.com/mark3labs/mcp-go v1.1.1
+	github.com/mark3labs/mcp-go v1.4.0
 )
 
 require golang.org/x/sys v0.47.0 // indirect

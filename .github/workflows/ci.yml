@@ -48,7 +48,7 @@ jobs:
         run: go run golang.org/x/vuln/cmd/govulncheck@v1.6.0 ./...
 
       - name: Validate Node launch and packaging scripts
-        run: node --check install.js scripts/build-mcpb.mjs mcpb/server/launch.js
+        run: node --check bin/ames-unifi-mcp scripts/build-mcpb.mjs mcpb/server/launch.js
 
       - name: Build release targets
         run: make build-all

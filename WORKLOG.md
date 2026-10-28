@@ -1,5 +1,29 @@
 # Worklog
 
+## 2026-10-23 - Security review
+
+`9c7a76f` closes a permission-profile bypass. Tools splice caller-supplied keys into controller paths, and input validation checks path syntax only for `id`, `*_id` and MAC fields. A key such as `../../cmd/devmgr` on `system_setting_update`, which the standard profile allows, reached command endpoints that profile denies once the console normalized the path, and deeper traversal reached UniFi OS endpoints. The client now refuses any request whose decoded path has a `.` or `..` segment. The same commit holds redirects to the host allowlist, because net/http forwards `X-API-Key` and `X-Csrf-Token` to any redirect target. `2b6d5f0` removes `install.js`, a postinstall script that package.json no longer runs or ships.
+
+Verification with Go 1.26.10: gofmt, race tests, vet, staticcheck 2026.1, govulncheck 1.6.0 (no vulnerabilities found), the Node syntax checks and all four platform builds passed. New tests fail on the old client. No controller calls ran. Published 1.0.8 binaries keep the old behavior until the next release. Open review items: cloud tools send `UNIFI_API_KEY` to `api.ui.com`, and their `pageSize`, `nextToken` and `type` inputs are concatenated into the URL unescaped.
+
+---
+
+## 2026-10-23 - Release 1.0.8
+
+Tagged `v1.0.8` at `41ea81b`. The first release run published the GitHub release, then npm rejected the publish with a 404 because the `NPM_TOKEN` secret still held the July 13 token. The secret now holds the 1Password `npm Publish Token`, and a rerun of the failed job published npm with provenance.
+
+Verification: the release run passed race tests, vet, staticcheck and govulncheck. All six GitHub assets match `SHA256SUMS`, and the npm tarball's four binaries are byte-identical to the GitHub assets. The published binaries report go1.26.10, and `govulncheck -mode=binary` finds no vulnerabilities in the darwin-arm64 binary. npm lists 1.0.8 as `latest` with a provenance attestation. This repository publishes no Docker image; `make docker` builds locally.
+
+---
+
+## 2026-10-23 - Patched Go 1.26.10 toolchain and x/text
+
+Raised the minimum/CI Go version, CONTRIBUTING toolchain, and Docker builder from 1.26.8 to 1.26.10. OSV lists 14 standard library advisories against 1.26.8 (GO-2026-6599 through GO-2026-6617 and GO-2026-6809) and none against 1.26.10. The Docker builder compiled release images with the affected standard library. Updated golang.org/x/text from v0.14.0 to v0.41.0 for GO-2026-5970 and GO-2026-6629, which this code did not call.
+
+Verification with Go 1.26.10 passed: gofmt, race tests, vet, staticcheck 2026.1, govulncheck 1.6.0 (no vulnerabilities found, including module-level), the Node syntax checks, and all four platform builds. Docker image construction was not tested. Published binaries and images keep the old toolchain until the next release.
+
+---
+
 ## 2026-10-07 - GitHub Issue Review Closeout
 
 **What changed**: Reviewed the one open issue against source at `745ee915ec4d` and their complete issue history. No issue qualified for closure.

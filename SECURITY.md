@@ -12,4 +12,4 @@ Include the affected version, controller and Network application versions, permi
 
 ## Credential handling
 
-The server reads credentials from environment variables or caller-supplied 1Password references. It does not ship with a vault name, item name, credential, or telemetry service. Start with `UNIFI_PERMISSION_PROFILE=read-only`, keep TLS verification enabled when the controller has a trusted certificate, and use a dedicated UniFi API key with the least access the workflow needs.
+The server reads credentials from environment variables or caller-supplied 1Password references. It does not ship with a vault name, item name, credential, or error-reporting DSN. Sentry error reporting runs only when you set `SENTRY_DSN`, and it sends only the tool name and panic type for panics in tool handlers, never arguments, responses, or error text. Start with `UNIFI_PERMISSION_PROFILE=read-only`, keep TLS verification enabled when the controller has a trusted certificate, and use a dedicated UniFi API key with the least access the workflow needs.

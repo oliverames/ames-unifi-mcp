@@ -1,6 +1,6 @@
 ## 2026-10-29 - Recent-change release review
 
-**What changed**: Prepared version 1.0.9 at `adc123a` and pushed tag `v1.0.9` for the established binary, MCPB and npm release workflow. `go test ./...` passed; main CI passed (40974861739). Release run 40974863849 is still in progress at this entry.
+**What changed**: Prepared version 1.0.9 at `adc123a` and pushed tag `v1.0.9` for the established binary, MCPB and npm release workflow. `go test ./...` passed; main CI passed (40974861739). Release run 40974863849 completed successfully, publishing the binary/MCPB assets and npm package.
 
 **Left off at**: Remaining publication checks are recorded in the cross-project review handoff.
 
